@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f6f5fb">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Wir zwei · Familienplaner</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{
+  --a:#6366f1; --b:#f97316;
+  --bg:#f6f5fb; --card:#ffffff; --card2:#f0eff7; --text:#1d1b2c; --muted:#6e6a85; --line:#e4e2ef;
+  --shadow:0 1px 2px rgba(30,25,70,.05),0 6px 20px rgba(30,25,70,.06);
+  --radius:18px;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#121218;--card:#1d1d26;--card2:#262633;--text:#ecebf5;--muted:#9a97b0;--line:#2e2e3c;--shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25)}
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text)}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.4;min-height:100vh;padding-bottom:100px}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+input,textarea,select{font:inherit;color:inherit}
+[hidden]{display:none!important}
+
+/* ---------- Kopfbereich ---------- */
+.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.top-inner{max-width:1240px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto}
+.logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--a),var(--b));display:grid;place-items:center;color:#fff;font-weight:800;font-size:15px;letter-spacing:-.5px}
+.brand h1{font-size:18px;margin:0;letter-spacing:-.3px}
+.brand small{color:var(--muted);font-size:13px}
+.tabs{display:flex;background:var(--card2);border-radius:14px;padding:4px;gap:2px}
+.tabs button{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;font-size:14px;font-weight:600;color:var(--muted)}
+.tabs button svg{width:18px;height:18px}
+.tabs button.active{background:var(--card);color:var(--text);box-shadow:var(--shadow)}
+.icon-btn{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;color:var(--muted)}
+.icon-btn:hover{background:var(--card2)}
+.icon-btn svg{width:20px;height:20px}
+
+.toolbar{max-width:1240px;margin:0 auto;padding:16px 16px 4px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.datenav{display:flex;align-items:center;gap:6px}
+.datenav .lbl{font-size:20px;font-weight:700;letter-spacing:-.3px;min-width:0;padding:0 6px}
+.round{width:38px;height:38px;border-radius:50%;background:var(--card);box-shadow:var(--shadow);display:grid;place-items:center}
+.round svg{width:18px;height:18px}
+.pill-btn{padding:8px 14px;border-radius:999px;background:var(--card);box-shadow:var(--shadow);font-size:14px;font-weight:600}
+.filter{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.filter button{display:flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:var(--card);border:1.5px solid var(--line);font-size:14px;font-weight:600;color:var(--muted)}
+.filter button.active{color:var(--text);border-color:var(--text)}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex:none}
+.dot.a{background:var(--a)}.dot.b{background:var(--b)}.dot.both{background:linear-gradient(135deg,var(--a) 50%,var(--b) 50%)}
+
+main{max-width:1240px;margin:0 auto;padding:12px 16px}
+
+/* ---------- Personenfarben ---------- */
+.who-a{--grad:linear-gradient(135deg,var(--a),var(--a));--solid:var(--a);--tint:color-mix(in srgb,var(--a) 11%,var(--card))}
+.who-b{--grad:linear-gradient(135deg,var(--b),var(--b));--solid:var(--b);--tint:color-mix(in srgb,var(--b) 11%,var(--card))}
+.who-both{--grad:linear-gradient(135deg,var(--a),var(--b));--solid:var(--a);--tint:linear-gradient(90deg,color-mix(in srgb,var(--a) 11%,var(--card)),color-mix(in srgb,var(--b) 11%,var(--card)))}
+
+/* ---------- Karten / Sektionen ---------- */
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+.section{margin:22px 0 10px;display:flex;align-items:baseline;gap:10px}
+.section h3{margin:0;font-size:15px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
+.section .count{font-size:13px;color:var(--muted)}
+.section.warn h3{color:#dc2626}
+.list{display:flex;flex-direction:column;gap:8px}
+.empty{padding:28px;text-align:center;color:var(--muted);background:var(--card);border-radius:var(--radius);border:1.5px dashed var(--line)}
+.empty .big{font-size:34px;display:block;margin-bottom:6px}
+
+/* ---------- Aufgaben-Eintrag ---------- */
+.item{position:relative;display:flex;align-items:center;gap:12px;padding:12px 14px 12px 18px;border-radius:16px;background:var(--tint);overflow:hidden;transition:transform .15s,opacity .2s}
+.item::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--grad)}
+.item:active{transform:scale(.99)}
+.check{flex:none;width:34px;height:34px;border-radius:50%;border:2.5px solid transparent;background:linear-gradient(var(--card),var(--card)) padding-box,var(--grad) border-box;color:transparent;display:grid;place-items:center;transition:all .2s}
+.check svg{width:18px;height:18px}
+.item.done .check{background:var(--grad) border-box;color:#fff}
+.item-body{flex:1;min-width:0;cursor:pointer}
+.item-title{font-weight:650;font-size:16px}
+.item-desc{color:var(--muted);font-size:14px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item-meta{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:4px;font-size:12.5px;color:var(--muted)}
+.item.done .item-title{text-decoration:line-through;opacity:.5}
+.item.done .item-desc,.item.done .item-meta{opacity:.5}
+.avatar{flex:none;width:32px;height:32px;border-radius:50%;background:var(--grad);color:#fff;font-weight:700;font-size:13px;display:grid;place-items:center;letter-spacing:-.5px}
+.override-mark{font-size:11px;color:var(--muted)}
+
+/* ---------- Tag: Fortschritt ---------- */
+.hero{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center}
+.hero h2{margin:0;font-size:24px;letter-spacing:-.4px}
+.hero p{margin:4px 0 0;color:var(--muted)}
+.rings{display:flex;gap:18px}
+.ring{display:flex;align-items:center;gap:10px}
+.ring svg{width:58px;height:58px;transform:rotate(-90deg)}
+.ring .txt b{display:block;font-size:15px}
+.ring .txt span{font-size:13px;color:var(--muted)}
+.cols2{display:grid;grid-template-columns:1fr;gap:0 24px}
+@media (min-width:900px){.cols2{grid-template-columns:3fr 2fr}}
+
+/* ---------- Woche ---------- */
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+.wday{background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:10px 8px;min-height:180px;display:flex;flex-direction:column;gap:6px}
+.wday.today{outline:2.5px solid var(--text);outline-offset:-2.5px}
+.wday-head{display:flex;justify-content:space-between;align-items:baseline;padding:0 4px 4px;cursor:pointer}
+.wday-head b{font-size:15px}.wday-head span{font-size:13px;color:var(--muted)}
+.chip{position:relative;display:flex;align-items:flex-start;gap:7px;padding:7px 8px 7px 10px;border-radius:11px;background:var(--tint);font-size:13.5px;overflow:hidden}
+.chip::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--grad)}
+.chip .check{width:22px;height:22px;border-width:2px}
+.chip .check svg{width:13px;height:13px}
+.chip .item-body{font-weight:600;line-height:1.25;padding-top:2px;word-break:break-word}
+.chip.done .item-body{text-decoration:line-through;opacity:.5}
+.flexrow{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+@media (max-width:760px){
+  .week{grid-template-columns:1fr}
+  .wday{min-height:0}
+}
+
+/* ---------- Monat ---------- */
+.month{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.mhead{text-align:center;font-size:13px;font-weight:700;color:var(--muted);padding:4px 0}
+.mcell{background:var(--card);border-radius:12px;min-height:104px;padding:6px;display:flex;flex-direction:column;gap:3px;cursor:pointer;box-shadow:var(--shadow);overflow:hidden}
+.mcell.out{opacity:.4}
+.mcell.today{outline:2.5px solid var(--text);outline-offset:-2.5px}
+.mcell .num{font-size:13px;font-weight:700;padding:0 2px 2px;display:flex;justify-content:space-between}
+.mcell .num small{font-weight:600;color:var(--muted)}
+.mbar{font-size:11.5px;padding:2px 6px;border-radius:6px;background:var(--tint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-left:3px solid var(--solid)}
+.mbar.done{text-decoration:line-through;opacity:.5}
+.more{font-size:11px;color:var(--muted);padding-left:4px}
+.mdots{display:none;gap:3px;flex-wrap:wrap;padding:2px}
+@media (max-width:700px){
+  .mcell{min-height:64px}
+  .mbar,.more{display:none}
+  .mdots{display:flex}
+}
+
+/* ---------- Aufgabenliste ---------- */
+.trow{display:flex;align-items:center;gap:12px;padding:14px 16px 14px 20px;border-radius:16px;background:var(--tint);position:relative;overflow:hidden;cursor:pointer}
+.trow::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--grad)}
+.trow .ic{font-size:22px}
+.trow .main{flex:1;min-width:0}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:3px 9px;border-radius:999px;background:var(--card);color:var(--muted);font-weight:600}
+.summary{display:flex;gap:12px;flex-wrap:wrap}
+.summary .card{flex:1;min-width:180px;display:flex;align-items:center;gap:12px;padding:14px 16px}
+.summary .num{font-size:26px;font-weight:800;letter-spacing:-.5px}
+
+/* ---------- Balance ---------- */
+.bal-split{display:flex;height:46px;border-radius:14px;overflow:hidden;margin:14px 0 8px;background:var(--card2)}
+.bal-split div{display:flex;align-items:center;padding:0 14px;color:#fff;font-weight:700;font-size:15px;white-space:nowrap;transition:width .4s}
+.bal-a{background:var(--a)}.bal-b{background:var(--b);justify-content:flex-end}
+.verdict{font-size:15px;color:var(--muted)}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:12px}
+.stat{display:flex;flex-direction:column;gap:6px}
+.stat .row{display:flex;justify-content:space-between;font-size:14px}
+.stat .row span{color:var(--muted)}
+.catrow{display:grid;grid-template-columns:160px 1fr 90px;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+.catrow:last-child{border:0}
+.catbar{display:flex;height:12px;border-radius:6px;overflow:hidden;background:var(--card2)}
+.catbar i{display:block}
+.catrow .mins{text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+@media (max-width:600px){.catrow{grid-template-columns:110px 1fr 70px}}
+.seg-switch{display:inline-flex;background:var(--card2);border-radius:12px;padding:3px}
+.seg-switch button{padding:6px 14px;border-radius:9px;font-weight:600;font-size:14px;color:var(--muted)}
+.seg-switch button.active{background:var(--card);color:var(--text);box-shadow:var(--shadow)}
+
+/* ---------- FAB ---------- */
+.fab{position:fixed;right:max(20px,env(safe-area-inset-right));bottom:max(24px,env(safe-area-inset-bottom));z-index:30;height:60px;padding:0 24px 0 20px;border-radius:30px;background:linear-gradient(135deg,var(--a),var(--b));color:#fff;font-weight:700;font-size:16px;display:flex;align-items:center;gap:8px;box-shadow:0 10px 30px color-mix(in srgb,var(--a) 40%,transparent)}
+.fab svg{width:24px;height:24px}
+
+/* ---------- Modal ---------- */
+.modal{position:fixed;inset:0;z-index:50;background:rgba(15,12,35,.45);display:flex;align-items:center;justify-content:center;padding:16px;animation:fade .15s}
+.sheet{background:var(--card);border-radius:24px;width:100%;max-width:620px;max-height:calc(100vh - 32px);overflow:auto;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:pop .2s}
+@keyframes fade{from{opacity:0}}
+@keyframes pop{from{transform:translateY(16px) scale(.98);opacity:0}}
+.sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sheet-head h2{margin:0;font-size:21px;letter-spacing:-.3px}
+.field{display:flex;flex-direction:column;gap:7px;margin:14px 0}
+.field>span{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.field em{font-style:normal;font-weight:500;text-transform:none;letter-spacing:0}
+.field input[type=text],.field input:not([type]),.field input[type=date],.field input[type=number],.field textarea,.field select{width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);outline:none}
+.field input:focus,.field textarea:focus{border-color:var(--a)}
+.field small{color:var(--muted);font-size:12.5px}
+.opts{display:flex;flex-wrap:wrap;gap:7px}
+.opt{position:relative}
+.opt input{position:absolute;opacity:0;pointer-events:none}
+.opt span{display:flex;align-items:center;gap:7px;padding:9px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);font-size:14.5px;font-weight:600;cursor:pointer;user-select:none}
+.opt input:checked+span{border-color:var(--text);background:var(--card);box-shadow:var(--shadow)}
+.opt.who input:checked+span{border-color:transparent;background:var(--grad);color:#fff}
+.wd .opt span{width:46px;justify-content:center;padding:9px 0}
+.inline{display:flex;align-items:center;gap:10px}
+.inline input{width:90px!important}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:520px){.row2{grid-template-columns:1fr}}
+.actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;flex-wrap:wrap}
+.btn{padding:12px 20px;border-radius:12px;font-weight:700;background:var(--card2)}
+.btn.primary{background:var(--text);color:var(--bg)}
+.btn.danger{color:#dc2626;margin-right:auto}
+.hint{background:var(--card2);border-radius:12px;padding:10px 14px;font-size:13.5px;color:var(--muted);margin-top:8px}
+.swatches{display:flex;gap:8px;flex-wrap:wrap}
+.swatches .opt span{width:36px;height:36px;padding:0;border-radius:50%;border:3px solid transparent}
+.swatches .opt input:checked+span{border-color:var(--text);box-shadow:inset 0 0 0 3px var(--card)}
+.det-desc{white-space:pre-wrap;background:var(--bg);border-radius:12px;padding:12px 14px;margin:10px 0}
+
+/* ---------- Sync ---------- */
+.sync-ind{position:relative}
+.sdot{width:10px;height:10px;border-radius:50%;display:inline-block;flex:none;background:#9ca3af}
+.sdot.online{background:#10b981}.sdot.offline{background:#f59e0b}.sdot.connecting{background:#60a5fa}.sdot.error{background:#dc2626}
+.sync-ind .sdot{position:absolute;right:5px;bottom:6px;border:2px solid var(--bg);width:12px;height:12px}
+.syncbox{display:flex;align-items:center;gap:10px;font-weight:600;margin-bottom:10px}
+.qr{display:grid;place-items:center;background:#fff;border-radius:16px;padding:14px;margin:12px auto;width:fit-content}
+.qr svg,.qr img{width:240px;height:240px;display:block}
+.code{font-family:ui-monospace,Consolas,monospace;font-size:12px;word-break:break-all}
+.actions.start{justify-content:flex-start;margin-top:0}
+.muted{color:var(--muted);font-size:14px;margin:0 0 10px}
+
+.toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--bg);padding:10px 18px;border-radius:999px;font-weight:600;font-size:14px;opacity:0;pointer-events:none;transition:all .25s;z-index:60}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.banner{max-width:1240px;margin:12px auto 0;padding:10px 16px;background:#fef3c7;color:#92400e;border-radius:12px;font-size:14px}
+
+@media (max-width:820px){
+  .tabs button span{display:none}
+  .tabs button{padding:9px 12px}
+  .hero{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  .brand small{display:none}
+  .filter{margin-left:0;width:100%}
+  .datenav .lbl{font-size:17px}
+  .fab span{display:none}.fab{padding:0;width:60px;justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">
+      <div class="logo">W2</div>
+      <div><h1>Wir zwei</h1><small id="subtitle"></small></div>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button data-view="day"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><span>Tag</span></button>
+      <button data-view="week"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9 4v16M15 4v16"/></svg><span>Woche</span></button>
+      <button data-view="month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M3 9h18M8 2v4M16 2v4M8 13h.01M12 13h.01M16 13h.01M8 17h.01M12 17h.01"/></svg><span>Monat</span></button>
+      <button data-view="tasks"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6h12M9 12h12M9 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg><span>Aufgaben</span></button>
+      <button data-view="balance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M7 21h10M5 7h14M5 7l-3 7a4 4 0 0 0 6 0zM19 7l-3 7a4 4 0 0 0 6 0z"/></svg><span>Balance</span></button>
+    </nav>
+    <button class="icon-btn sync-ind" id="syncInd" data-action="settings" title="Synchronisierung" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H7a5 5 0 1 1 1.1-9.9A6 6 0 0 1 19.6 11 4 4 0 0 1 17.5 19z"/></svg><span class="sdot"></span></button>
+    <button class="icon-btn" data-action="settings" title="Einstellungen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+  </div>
+</header>
+
+<div id="banner" class="banner" hidden></div>
+<div class="toolbar" id="toolbar"></div>
+<main id="view"></main>
+
+<button class="fab" data-action="new"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg><span>Neue Aufgabe</span></button>
+<div id="modal" class="modal" hidden><div class="sheet" id="sheet"></div></div>
+<div id="toast" class="toast"></div>
+
+<script>
+'use strict';
+/* =========================================================
+   Konstanten & Hilfsfunktionen
+   ========================================================= */
+const KEY = 'wirzwei.v1';
+const UIKEY = 'wirzwei.ui';
+const WD = ['Mo','Di','Mi','Do','Fr','Sa','So'];
+const WD_LONG = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'];
+const COLORS = ['#6366f1','#8b5cf6','#ec4899','#f43f5e','#f97316','#f59e0b','#10b981','#14b8a6','#0ea5e9','#64748b'];
+const CATS = [
+  {id:'haushalt',   name:'Haushalt',        icon:'🧹'},
+  {id:'kinder',     name:'Kinder',          icon:'🧸'},
+  {id:'essen',      name:'Essen & Einkauf', icon:'🛒'},
+  {id:'orga',       name:'Organisation',    icon:'🗂️'},
+  {id:'termine',    name:'Termine',         icon:'📅'},
+  {id:'finanzen',   name:'Finanzen',        icon:'💶'},
+  {id:'gesundheit', name:'Gesundheit',      icon:'🩺'},
+  {id:'sonstiges',  name:'Sonstiges',       icon:'✨'},
+];
+const FREQS = [
+  {id:'daily',     name:'Täglich'},
+  {id:'weekdays',  name:'Werktags'},
+  {id:'weekly',    name:'Wöchentlich'},
+  {id:'weekflex',  name:'1× pro Woche (flexibel)'},
+  {id:'monthly',   name:'Monatlich'},
+  {id:'monthflex', name:'1× pro Monat (flexibel)'},
+  {id:'yearly',    name:'Jährlich'},
+  {id:'once',      name:'Einmalig'},
+];
+const ICON_CHECK = '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const ICON_L = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>';
+const ICON_R = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>';
+
+const pad = n => String(n).padStart(2,'0');
+const iso = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const parse = s => { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); };
+const addDays = (s,n) => { const d = parse(s); d.setDate(d.getDate()+n); return iso(d); };
+const addMonths = (s,n) => { const d = parse(s); return iso(new Date(d.getFullYear(), d.getMonth()+n, 1)); };
+const daysBetween = (a,b) => Math.round((parse(b) - parse(a)) / 864e5);
+const dow = s => (parse(s).getDay() + 6) % 7;            // 0 = Montag
+const monday = s => addDays(s, -dow(s));
+const monthsBetween = (a,b) => { const A = parse(a), B = parse(b); return (B.getFullYear()-A.getFullYear())*12 + B.getMonth()-A.getMonth(); };
+const daysInMonth = (y,m) => new Date(y, m+1, 0).getDate();
+const mod = (a,n) => ((a % n) + n) % n;
+const today = () => iso(new Date());
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = (s, o) => parse(s).toLocaleDateString('de-DE', o);
+const fmtShort = s => fmt(s, {day:'numeric', month:'short'});
+const fmtLong = s => fmt(s, {weekday:'long', day:'numeric', month:'long'});
+const cat = id => CATS.find(c => c.id === id) || CATS[CATS.length-1];
+const isoWeek = s => { const d = parse(s); d.setDate(d.getDate() + 3 - ((d.getDay()+6)%7)); const w1 = new Date(d.getFullYear(),0,4); return 1 + Math.round(((d - w1)/864e5 - 3 + ((w1.getDay()+6)%7)) / 7); };
+const fmtMins = m => m >= 60 ? `${Math.floor(m/60)} h${m%60 ? ' ' + (m%60) + ' min' : ''}` : `${m} min`;
+
+/* =========================================================
+   Zustand & Speicherung
+   ========================================================= */
+let storageOK = true;
+try { localStorage.setItem('__t','1'); localStorage.removeItem('__t'); } catch(e) { storageOK = false; }
+
+function defaultState(){
+  return {
+    version: 1,
+    setupDone: false,
+    people: { a:{name:'Ich', color:'#6366f1'}, b:{name:'Partnerin', color:'#f97316'} },
+    tasks: [],        // Aufgaben (Versionen; gleiche sid = gleiche Serie)
+    done: {},         // key -> {at}
+    overrides: {},    // key -> 'a' | 'b' | 'both'  (Zuständigkeit für einen einzelnen Termin)
+  };
+}
+function load(){
+  try { const raw = localStorage.getItem(KEY); if (raw) return Object.assign(defaultState(), JSON.parse(raw)); } catch(e) {}
+  return defaultState();
+}
+let state = load();
+let ui = Object.assign({view:'day', filter:'all', balRange:'week'}, (() => { try { return JSON.parse(localStorage.getItem(UIKEY)) || {}; } catch(e) { return {}; } })());
+ui.cursor = today();
+
+function saveLocal(){
+  if (!storageOK) return;
+  try { localStorage.setItem(KEY, JSON.stringify(state)); }
+  catch(e) { showBanner('Speichern fehlgeschlagen. Bitte unter Einstellungen ein Backup exportieren.'); }
+}
+function save(){ saveLocal(); pushSync(); }
+function saveUI(){ try { localStorage.setItem(UIKEY, JSON.stringify({view:ui.view, filter:ui.filter, balRange:ui.balRange})); } catch(e) {} }
+if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(()=>{});
+
+const P = k => state.people[k];
+const whoName = w => w === 'both' ? 'Beide' : w === 'alt' ? 'Abwechselnd' : P(w).name;
+const initials = w => w === 'both' ? '∞' : (P(w).name.trim()[0] || '?').toUpperCase();
+
+/* =========================================================
+   Wiederholungslogik
+   ========================================================= */
+const DAY_TYPES = ['once','daily','weekdays','weekly','monthly','yearly'];
+
+function active(t, from, to){ return t.start <= to && (!t.end || t.end >= from); }
+
+function occursOn(t, d){
+  if (!active(t, d, d)) return false;
+  const f = t.freq, n = f.every || 1;
+  switch (f.type){
+    case 'once':     return d === f.date;
+    case 'daily':    return mod(daysBetween(t.origin, d), n) === 0;
+    case 'weekdays': return dow(d) < 5;
+    case 'weekly':   return f.days.includes(dow(d)) && mod(daysBetween(monday(t.origin), monday(d))/7, n) === 0;
+    case 'monthly': {
+      const D = parse(d), target = Math.min(f.dom, daysInMonth(D.getFullYear(), D.getMonth()));
+      return D.getDate() === target && mod(monthsBetween(t.origin, d), n) === 0;
+    }
+    case 'yearly':   return d.slice(5) === f.date.slice(5) && d >= f.date;
+  }
+  return false;
+}
+
+function periodIndex(t, d){
+  const f = t.freq, n = f.every || 1;
+  switch (f.type){
+    case 'daily': case 'weekdays': return Math.floor(daysBetween(t.origin, d) / n);
+    case 'weekly': case 'weekflex': return Math.floor(daysBetween(monday(t.origin), monday(d)) / 7 / n);
+    case 'monthly': case 'monthflex': return Math.floor(monthsBetween(t.origin, d) / n);
+    case 'yearly': return parse(d).getFullYear() - parse(t.origin).getFullYear();
+  }
+  return 0;
+}
+
+function makeInst(t, key, d){
+  let who = state.overrides[key];
+  const overridden = !!who;
+  if (!who) who = t.assignee === 'alt' ? (mod(periodIndex(t, d), 2) === 0 ? (t.altStart || 'a') : (t.altStart === 'b' ? 'a' : 'b')) : t.assignee;
+  return { task:t, key, date:d, who, overridden, done: !!state.done[key] };
+}
+
+function dayInsts(d){
+  return state.tasks.filter(t => DAY_TYPES.includes(t.freq.type) && occursOn(t, d))
+    .map(t => makeInst(t, `${t.sid}|${d}`, d));
+}
+// Wird eine Serie mitten in der Woche/im Monat geändert, gilt für diesen Zeitraum die neuere Version
+function latestPerSeries(list){
+  const m = new Map();
+  list.forEach(t => { if (!m.has(t.sid) || m.get(t.sid).start < t.start) m.set(t.sid, t); });
+  return [...m.values()];
+}
+function weekFlexInsts(mon){
+  const sun = addDays(mon, 6);
+  return latestPerSeries(state.tasks.filter(t => t.freq.type === 'weekflex' && active(t, mon, sun)
+      && mod(daysBetween(monday(t.origin), mon)/7, t.freq.every || 1) === 0))
+    .map(t => makeInst(t, `${t.sid}|W${mon}`, mon));
+}
+function monthFlexInsts(anyDay){
+  const D = parse(anyDay), first = iso(new Date(D.getFullYear(), D.getMonth(), 1)), last = iso(new Date(D.getFullYear(), D.getMonth()+1, 0));
+  return latestPerSeries(state.tasks.filter(t => t.freq.type === 'monthflex' && active(t, first, last)
+      && mod(monthsBetween(t.origin, first), t.freq.every || 1) === 0))
+    .map(t => makeInst(t, `${t.sid}|M${first.slice(0,7)}`, first));
+}
+function overdueInsts(){
+  const td = today();
+  return state.tasks.filter(t => t.freq.type === 'once' && !t.end && t.freq.date < td && t.freq.date >= t.start && !state.done[`${t.sid}|${t.freq.date}`])
+    .map(t => makeInst(t, `${t.sid}|${t.freq.date}`, t.freq.date));
+}
+
+const matchesFilter = i => ui.filter === 'all' || i.who === ui.filter || i.who === 'both';
+const sortInsts = arr => arr.sort((x,y) => (x.done - y.done) || ({a:0,b:1,both:2}[x.who] - {a:0,b:1,both:2}[y.who]) || x.task.title.localeCompare(y.task.title, 'de'));
+
+function freqText(t){
+  const f = t.freq, n = f.every || 1;
+  switch (f.type){
+    case 'once':      return `Einmalig · ${fmtShort(f.date)}`;
+    case 'daily':     return n > 1 ? `Alle ${n} Tage` : 'Täglich';
+    case 'weekdays':  return 'Werktags (Mo–Fr)';
+    case 'weekly':    return `${n > 1 ? `Alle ${n} Wochen` : 'Wöchentlich'} · ${[...f.days].sort().map(d => WD[d]).join(', ')}`;
+    case 'weekflex':  return n > 1 ? `1× alle ${n} Wochen` : '1× pro Woche';
+    case 'monthly':   return `${n > 1 ? `Alle ${n} Monate` : 'Monatlich'} · am ${f.dom}.`;
+    case 'monthflex': return n > 1 ? `1× alle ${n} Monate` : '1× pro Monat';
+    case 'yearly':    return `Jährlich · ${fmt(f.date, {day:'numeric', month:'long'})}`;
+  }
+  return '';
+}
+
+/* =========================================================
+   Rendering
+   ========================================================= */
+const $ = s => document.querySelector(s);
+let instIndex = new Map();
+
+function applyColors(){
+  document.documentElement.style.setProperty('--a', P('a').color);
+  document.documentElement.style.setProperty('--b', P('b').color);
+}
+
+function render(){
+  applyColors();
+  instIndex = new Map();
+  document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('active', b.dataset.view === ui.view));
+  $('#subtitle').textContent = `${P('a').name} & ${P('b').name}`;
+  renderToolbar();
+  const v = $('#view');
+  ({day:renderDay, week:renderWeek, month:renderMonth, tasks:renderTasks, balance:renderBalance})[ui.view](v);
+}
+
+function filterHTML(){
+  const b = (k, label, dot) => `<button class="${ui.filter === k ? 'active' : ''}" data-action="filter" data-f="${k}">${dot ? `<span class="dot ${k}"></span>` : ''}${esc(label)}</button>`;
+  return `<div class="filter">${b('all','Alle', false)}${b('a', P('a').name, true)}${b('b', P('b').name, true)}</div>`;
+}
+
+function renderToolbar(){
+  const c = ui.cursor, td = today();
+  let label = '', isNow = false;
+  if (ui.view === 'day'){
+    label = c === td ? 'Heute' : c === addDays(td,1) ? 'Morgen' : c === addDays(td,-1) ? 'Gestern' : fmt(c, {weekday:'short', day:'numeric', month:'short'});
+    isNow = c === td;
+  } else if (ui.view === 'week' || (ui.view === 'balance' && ui.balRange === 'week')){
+    const m = monday(c);
+    label = `KW ${isoWeek(m)} · ${fmtShort(m)} – ${fmtShort(addDays(m,6))}`;
+    isNow = m === monday(td);
+  } else if (ui.view === 'month' || ui.view === 'balance'){
+    label = fmt(c, {month:'long', year:'numeric'});
+    isNow = c.slice(0,7) === td.slice(0,7);
+  }
+  const nav = label ? `<div class="datenav">
+      <button class="round" data-action="prev" aria-label="zurück">${ICON_L}</button>
+      <button class="round" data-action="next" aria-label="vor">${ICON_R}</button>
+      <span class="lbl">${esc(label)}</span>
+      ${isNow ? '' : '<button class="pill-btn" data-action="now">Heute</button>'}
+    </div>` : `<div class="datenav"><span class="lbl">Alle Aufgaben</span></div>`;
+  $('#toolbar').innerHTML = nav + (ui.view === 'balance' ? '' : filterHTML());
+}
+
+function itemHTML(i, opts = {}){
+  instIndex.set(i.key, i);
+  const t = i.task, c = cat(t.cat);
+  if (opts.chip){
+    return `<div class="chip who-${i.who} ${i.done ? 'done' : ''}" data-key="${esc(i.key)}">
+      <button class="check" data-action="toggle" aria-label="erledigt">${ICON_CHECK}</button>
+      <div class="item-body" data-action="open">${c.icon} ${esc(t.title)}</div></div>`;
+  }
+  const meta = [`${c.icon} ${c.name}`];
+  if (t.mins) meta.push(`⏱ ${t.mins} min`);
+  if (opts.showDate) meta.push(`📆 ${fmtShort(i.date)}`);
+  meta.push(`↻ ${freqText(t)}`);
+  if (i.overridden) meta.push('⇄ getauscht');
+  return `<div class="item who-${i.who} ${i.done ? 'done' : ''}" data-key="${esc(i.key)}">
+    <button class="check" data-action="toggle" aria-label="erledigt">${ICON_CHECK}</button>
+    <div class="item-body" data-action="open">
+      <div class="item-title">${esc(t.title)}</div>
+      ${t.desc ? `<div class="item-desc">${esc(t.desc)}</div>` : ''}
+      <div class="item-meta">${meta.map(m => `<span>${esc(m)}</span>`).join('')}</div>
+    </div>
+    <div class="avatar" title="${esc(whoName(i.who))}">${esc(initials(i.who))}</div>
+  </div>`;
+}
+
+function listHTML(arr, emptyText, opts){
+  if (!arr.length) return emptyText ? `<div class="empty">${emptyText}</div>` : '';
+  return `<div class="list">${sortInsts(arr).map(i => itemHTML(i, opts)).join('')}</div>`;
+}
+
+function ringHTML(k, list){
+  const mine = list.filter(i => i.who === k || i.who === 'both');
+  const done = mine.filter(i => i.done).length, total = mine.length;
+  const r = 24, C = 2 * Math.PI * r, p = total ? done / total : 0;
+  return `<div class="ring">
+    <svg viewBox="0 0 58 58"><circle cx="29" cy="29" r="${r}" fill="none" stroke="var(--card2)" stroke-width="7"/>
+    <circle cx="29" cy="29" r="${r}" fill="none" stroke="var(--${k})" stroke-width="7" stroke-linecap="round" stroke-dasharray="${C*p} ${C}"/></svg>
+    <div class="txt"><b>${esc(P(k).name)}</b><span>${done} von ${total} erledigt</span></div></div>`;
+}
+
+/* ---------- Tagesansicht ---------- */
+function renderDay(v){
+  const d = ui.cursor, td = today();
+  const all = dayInsts(d);
+  const weekFlex = weekFlexInsts(monday(d));
+  const monthFlex = monthFlexInsts(d);
+  const overdue = d === td ? overdueInsts() : [];
+  const list = all.filter(matchesFilter);
+  const open = list.filter(i => !i.done).length;
+  const greeting = d !== td ? fmtLong(d) : (h => h < 11 ? 'Guten Morgen ☀️' : h < 17 ? 'Hallo zusammen 👋' : 'Guten Abend 🌙')(new Date().getHours());
+  const sub = !list.length ? 'Nichts geplant – genießt den Tag.' : open ? `${open} ${open === 1 ? 'Aufgabe ist' : 'Aufgaben sind'} noch offen.` : 'Alles erledigt – stark! 🎉';
+
+  v.innerHTML = `
+    <div class="card hero">
+      <div><h2>${esc(greeting)}</h2><p>${d === td ? esc(fmtLong(d)) + ' · ' : ''}${sub}</p></div>
+      <div class="rings">${ringHTML('a', all)}${ringHTML('b', all)}</div>
+    </div>
+    <div class="cols2">
+      <div>
+        ${overdue.filter(matchesFilter).length ? `<div class="section warn"><h3>Überfällig</h3></div>${listHTML(overdue.filter(matchesFilter), '', {showDate:true})}` : ''}
+        <div class="section"><h3>${d === td ? 'Heute' : 'An diesem Tag'}</h3><span class="count">${list.length}</span></div>
+        ${listHTML(list, '<span class="big">🌿</span>Für diesen Tag steht nichts an.')}
+      </div>
+      <div>
+        <div class="section"><h3>Diese Woche · flexibel</h3><span class="count">${weekFlex.filter(matchesFilter).length}</span></div>
+        ${listHTML(weekFlex.filter(matchesFilter), 'Keine flexiblen Wochenaufgaben.')}
+        <div class="section"><h3>Diesen Monat · flexibel</h3><span class="count">${monthFlex.filter(matchesFilter).length}</span></div>
+        ${listHTML(monthFlex.filter(matchesFilter), 'Keine flexiblen Monatsaufgaben.')}
+      </div>
+    </div>`;
+}
+
+/* ---------- Wochenansicht ---------- */
+function renderWeek(v){
+  const m = monday(ui.cursor), td = today();
+  const flex = weekFlexInsts(m).filter(matchesFilter);
+  let days = '';
+  for (let k = 0; k < 7; k++){
+    const d = addDays(m, k);
+    const list = sortInsts(dayInsts(d).filter(matchesFilter));
+    const open = list.filter(i => !i.done).length;
+    days += `<div class="wday ${d === td ? 'today' : ''}">
+      <div class="wday-head" data-action="goday" data-date="${d}"><b>${WD[k]} ${parse(d).getDate()}.</b><span>${list.length ? `${open} offen` : ''}</span></div>
+      ${list.map(i => itemHTML(i, {chip:true})).join('')}
+    </div>`;
+  }
+  v.innerHTML = `
+    ${flex.length ? `<div class="section"><h3>Irgendwann diese Woche</h3><span class="count">${flex.length}</span></div><div class="flexrow">${sortInsts(flex).map(i => itemHTML(i, {chip:true})).join('')}</div><div class="section"><h3>Tage</h3></div>` : ''}
+    <div class="week">${days}</div>`;
+}
+
+/* ---------- Monatsansicht ---------- */
+function renderMonth(v){
+  const D = parse(ui.cursor), td = today();
+  const first = iso(new Date(D.getFullYear(), D.getMonth(), 1));
+  const start = monday(first);
+  const flex = monthFlexInsts(first).filter(matchesFilter);
+  let cells = WD.map(w => `<div class="mhead">${w}</div>`).join('');
+  for (let k = 0; k < 42; k++){
+    const d = addDays(start, k);
+    if (k >= 35 && parse(d).getMonth() !== D.getMonth()) break;
+    const list = sortInsts(dayInsts(d).filter(matchesFilter));
+    const shown = list.slice(0, 3);
+    const done = list.filter(i => i.done).length;
+    cells += `<div class="mcell ${parse(d).getMonth() !== D.getMonth() ? 'out' : ''} ${d === td ? 'today' : ''}" data-action="goday" data-date="${d}">
+      <div class="num">${parse(d).getDate()}${list.length ? `<small>${done}/${list.length}</small>` : ''}</div>
+      ${shown.map(i => `<div class="mbar who-${i.who} ${i.done ? 'done' : ''}">${esc(i.task.title)}</div>`).join('')}
+      ${list.length > 3 ? `<div class="more">+ ${list.length - 3} weitere</div>` : ''}
+      <div class="mdots">${list.map(i => `<span class="dot ${i.who}" style="${i.done ? 'opacity:.3' : ''}"></span>`).join('')}</div>
+    </div>`;
+  }
+  v.innerHTML = `
+    ${flex.length ? `<div class="section"><h3>Irgendwann diesen Monat</h3><span class="count">${flex.length}</span></div><div class="flexrow">${sortInsts(flex).map(i => itemHTML(i, {chip:true})).join('')}</div><div class="section"><h3>Kalender</h3></div>` : ''}
+    <div class="month">${cells}</div>`;
+}
+
+/* ---------- Aufgabenverwaltung ---------- */
+function currentTasks(){
+  const td = today();
+  return state.tasks.filter(t => !t.end || t.end >= td)
+    .filter(t => !(t.freq.type === 'once' && t.freq.date < td && state.done[`${t.sid}|${t.freq.date}`]));
+}
+function renderTasks(v){
+  const tasks = currentTasks().filter(t => ui.filter === 'all' || t.assignee === ui.filter || t.assignee === 'both' || t.assignee === 'alt');
+  const count = k => currentTasks().filter(t => t.assignee === k).length;
+  const groups = [
+    ['Täglich & werktags', ['daily','weekdays']],
+    ['Wöchentlich', ['weekly','weekflex']],
+    ['Monatlich', ['monthly','monthflex']],
+    ['Jährlich', ['yearly']],
+    ['Einmalig', ['once']],
+  ];
+  const row = t => {
+    const c = cat(t.cat), cls = t.assignee === 'alt' ? 'both' : t.assignee;
+    const future = t.start > today() ? `<span class="badge">ab ${fmtShort(t.start)}</span>` : '';
+    return `<div class="trow who-${cls}" data-action="edit" data-id="${t.id}">
+      <div class="ic">${c.icon}</div>
+      <div class="main"><div class="item-title">${esc(t.title)}</div>
+        ${t.desc ? `<div class="item-desc">${esc(t.desc)}</div>` : ''}
+        <div class="item-meta"><span>↻ ${esc(freqText(t))}</span>${t.mins ? `<span>⏱ ${t.mins} min</span>` : ''}</div></div>
+      ${future}<span class="badge"><span class="dot ${cls}"></span>${esc(whoName(t.assignee))}</span>
+    </div>`;
+  };
+  v.innerHTML = `
+    <div class="summary">
+      <div class="card"><span class="dot a" style="width:14px;height:14px"></span><div><div class="num">${count('a')}</div><small>${esc(P('a').name)}</small></div></div>
+      <div class="card"><span class="dot b" style="width:14px;height:14px"></span><div><div class="num">${count('b')}</div><small>${esc(P('b').name)}</small></div></div>
+      <div class="card"><span class="dot both" style="width:14px;height:14px"></span><div><div class="num">${count('both') + count('alt')}</div><small>Gemeinsam / abwechselnd</small></div></div>
+    </div>
+    ${tasks.length ? groups.map(([name, types]) => {
+      const g = tasks.filter(t => types.includes(t.freq.type)).sort((x,y) => x.title.localeCompare(y.title, 'de'));
+      return g.length ? `<div class="section"><h3>${name}</h3><span class="count">${g.length}</span></div><div class="list">${g.map(row).join('')}</div>` : '';
+    }).join('') : `<div class="empty" style="margin-top:20px"><span class="big">📝</span>Noch keine Aufgaben. Leg mit „Neue Aufgabe“ los.</div>`}`;
+}
+
+/* ---------- Balance (Equal Care) ---------- */
+function rangeInsts(){
+  const c = ui.cursor;
+  let days = [], weeks = [], months = [];
+  if (ui.balRange === 'week'){
+    const m = monday(c);
+    for (let k = 0; k < 7; k++) days.push(addDays(m, k));
+    weeks = [m];
+  } else {
+    const D = parse(c), n = daysInMonth(D.getFullYear(), D.getMonth());
+    for (let k = 1; k <= n; k++) days.push(iso(new Date(D.getFullYear(), D.getMonth(), k)));
+    weeks = days.filter(d => dow(d) === 0);
+    months = [days[0]];
+  }
+  return [...days.flatMap(dayInsts), ...weeks.flatMap(weekFlexInsts), ...months.flatMap(monthFlexInsts)];
+}
+function renderBalance(v){
+  const insts = rangeInsts();
+  const s = {a:{n:0,m:0,dn:0,dm:0}, b:{n:0,m:0,dn:0,dm:0}};
+  const byCat = {};
+  insts.forEach(i => {
+    const m = i.task.mins || 0;
+    const ws = i.who === 'both' ? ['a','b'] : [i.who];
+    ws.forEach(w => {
+      s[w].n++; s[w].m += m;
+      if (i.done){ s[w].dn++; s[w].dm += m; }
+      byCat[i.task.cat] = byCat[i.task.cat] || {a:0, b:0};
+      byCat[i.task.cat][w] += m;
+    });
+  });
+  const tot = s.a.m + s.b.m;
+  const pa = tot ? Math.round(s.a.m / tot * 100) : 50, pb = 100 - pa;
+  let verdict = 'Noch keine Aufgaben mit Zeitangabe in diesem Zeitraum.';
+  if (tot){
+    if (Math.abs(pa - 50) <= 7) verdict = '⚖️ Ziemlich ausgeglichen – schön!';
+    else verdict = `${pa > 50 ? esc(P('a').name) : esc(P('b').name)} trägt gerade mehr (${Math.max(pa,pb)} % der geplanten Zeit). Vielleicht etwas umverteilen?`;
+  }
+  const statCard = k => `<div class="card stat who-${k}">
+    <div style="display:flex;align-items:center;gap:10px"><div class="avatar">${esc(initials(k))}</div><b style="font-size:17px">${esc(P(k).name)}</b></div>
+    <div class="row"><span>Aufgaben geplant</span><b>${s[k].n}</b></div>
+    <div class="row"><span>davon erledigt</span><b>${s[k].dn}</b></div>
+    <div class="row"><span>Zeit geplant</span><b>${fmtMins(s[k].m)}</b></div>
+    <div class="row"><span>Zeit erledigt</span><b>${fmtMins(s[k].dm)}</b></div></div>`;
+  const cats = CATS.filter(c => byCat[c.id] && (byCat[c.id].a + byCat[c.id].b) > 0);
+  v.innerHTML = `
+    <div style="margin:4px 0 14px" class="seg-switch">
+      <button class="${ui.balRange === 'week' ? 'active' : ''}" data-action="balrange" data-r="week">Woche</button>
+      <button class="${ui.balRange === 'month' ? 'active' : ''}" data-action="balrange" data-r="month">Monat</button>
+    </div>
+    <div class="card">
+      <div class="section" style="margin:0"><h3>Verteilung der geplanten Zeit</h3></div>
+      <div class="bal-split">
+        <div class="bal-a" style="width:${pa}%">${pa >= 12 ? `${esc(P('a').name)} ${pa} %` : ''}</div>
+        <div class="bal-b" style="width:${pb}%">${pb >= 12 ? `${pb} % ${esc(P('b').name)}` : ''}</div>
+      </div>
+      <div class="verdict">${verdict}</div>
+      <div class="hint">„Beide“-Aufgaben zählen für beide voll. Abwechselnde Aufgaben zählen für die Person, die gerade dran ist. Die Zeit stammt aus der „Dauer“ jeder Aufgabe.</div>
+    </div>
+    <div class="stat-grid">${statCard('a')}${statCard('b')}</div>
+    <div class="section"><h3>Nach Bereichen</h3></div>
+    <div class="card">
+      ${cats.length ? cats.map(c => {
+        const x = byCat[c.id], t = x.a + x.b;
+        return `<div class="catrow"><div>${c.icon} ${c.name}</div>
+          <div class="catbar"><i style="width:${x.a/t*100}%;background:var(--a)"></i><i style="width:${x.b/t*100}%;background:var(--b)"></i></div>
+          <div class="mins">${fmtMins(t)}</div></div>`;
+      }).join('') : '<div style="color:var(--muted)">Noch keine Daten.</div>'}
+    </div>`;
+}
+
+/* =========================================================
+   Dialoge
+   ========================================================= */
+function openModal(html, onMount){
+  $('#sheet').innerHTML = html;
+  $('#modal').hidden = false;
+  onMount && onMount($('#sheet'));
+}
+function closeModal(){
+  if (!state.setupDone) return;
+  $('#modal').hidden = true; $('#sheet').innerHTML = '';
+}
+
+function opt(name, value, label, checked, cls = '', type = 'radio'){
+  return `<label class="opt ${cls}"><input type="${type}" name="${name}" value="${esc(value)}" ${checked ? 'checked' : ''}><span>${label}</span></label>`;
+}
+
+/* ---------- Aufgabe anlegen / bearbeiten ---------- */
+function openTaskForm(task){
+  const td = today();
+  const isEdit = !!task;
+  const t = task ? JSON.parse(JSON.stringify(task)) : {
+    title:'', desc:'', cat:'haushalt', mins:15, assignee: ui.filter === 'b' ? 'b' : 'a',
+    freq:{type:'weekly', every:1, days:[dow(td)], dom:parse(td).getDate(), date:td}, start:td
+  };
+  t.freq = Object.assign({every:1, days:[dow(td)], dom:parse(td).getDate(), date:td}, t.freq);
+  if (t.freq.date < td) t.freq.date = td;
+  const startVal = t.start < td ? td : t.start;
+  const whoOpt = (k, label) => `<label class="opt who who-${k === 'alt' ? 'both' : k}"><input type="radio" name="who" value="${k}" ${t.assignee === k ? 'checked' : ''}><span>${esc(label)}</span></label>`;
+
+  openModal(`
+    <div class="sheet-head"><h2>${isEdit ? 'Aufgabe bearbeiten' : 'Neue Aufgabe'}</h2><button class="icon-btn" data-action="close">✕</button></div>
+    <form id="taskForm" autocomplete="off">
+      <label class="field"><span>Was ist zu tun?</span><input name="title" maxlength="80" value="${esc(t.title)}" placeholder="z. B. Brotdosen packen" required></label>
+      <label class="field"><span>Beschreibung <em>(optional)</em></span><textarea name="desc" rows="2" placeholder="Details, Hinweise, Ansprechpartner …">${esc(t.desc)}</textarea></label>
+      <div class="field"><span>Wer ist zuständig?</span><div class="opts">
+        ${whoOpt('a', P('a').name)}${whoOpt('b', P('b').name)}${whoOpt('both','Beide')}${whoOpt('alt','Abwechselnd')}
+      </div></div>
+      <div class="field" data-show="alt"><span>Wer beginnt?</span><div class="opts">
+        ${opt('altStart','a',esc(P('a').name),(t.altStart||'a') === 'a')}${opt('altStart','b',esc(P('b').name),t.altStart === 'b')}
+      </div><small>Wechselt je Tag, Woche bzw. Monat – je nach Häufigkeit.</small></div>
+      <div class="field"><span>Wie oft?</span><div class="opts">
+        ${FREQS.map(f => opt('ftype', f.id, f.name, t.freq.type === f.id)).join('')}
+      </div></div>
+      <div class="field" data-for="weekly"><span>An welchen Tagen?</span><div class="opts wd">
+        ${WD.map((w,i) => opt('days', i, w, t.freq.days.includes(i), '', 'checkbox')).join('')}
+      </div></div>
+      <label class="field" data-for="monthly"><span>Am Tag des Monats</span><input type="number" name="dom" min="1" max="31" value="${t.freq.dom}"><small>In kürzeren Monaten automatisch am letzten Tag.</small></label>
+      <label class="field" data-for="once yearly"><span>Datum</span><input type="date" name="date" min="${td}" value="${t.freq.date}"></label>
+      <div class="field" data-for="daily weekly weekflex monthly monthflex"><span>Rhythmus</span>
+        <div class="inline"><span>alle</span><input type="number" name="every" min="1" max="12" value="${t.freq.every || 1}"><span class="unit"></span></div></div>
+      <div class="field"><span>Bereich</span><div class="opts">
+        ${CATS.map(c => opt('cat', c.id, `${c.icon} ${c.name}`, t.cat === c.id)).join('')}
+      </div></div>
+      <div class="row2">
+        <label class="field"><span>Dauer (Minuten)</span><input type="number" name="mins" min="0" max="600" step="5" value="${t.mins ?? 15}"></label>
+        <label class="field" data-for="daily weekdays weekly weekflex monthly monthflex"><span>Gilt ab</span><input type="date" name="start" min="${td}" value="${startVal}"></label>
+      </div>
+      ${isEdit && task.start < td ? `<div class="hint">ℹ️ Änderungen gelten erst ab dem gewählten Datum. Vergangene Tage und Erledigt-Häkchen bleiben unverändert.</div>` : `<div class="hint">ℹ️ Neue Aufgaben wirken nur in die Zukunft – frühestens ab heute.</div>`}
+      <div class="actions">
+        ${isEdit ? '<button type="button" class="btn danger" data-action="delete-task">Löschen</button>' : ''}
+        <button type="button" class="btn" data-action="close">Abbrechen</button>
+        <button type="submit" class="btn primary">Speichern</button>
+      </div>
+    </form>`, sheet => {
+      const form = sheet.querySelector('form');
+      const sync = () => {
+        const ty = form.querySelector('[name=ftype]:checked').value;
+        const who = form.querySelector('[name=who]:checked').value;
+        form.querySelectorAll('[data-for]').forEach(el => el.hidden = !el.dataset.for.split(' ').includes(ty));
+        form.querySelector('[data-show=alt]').hidden = who !== 'alt';
+        form.querySelector('.unit').textContent = ty === 'daily' ? 'Tag(e)' : ty.startsWith('week') ? 'Woche(n)' : 'Monat(e)';
+      };
+      form.addEventListener('change', sync);
+      sync();
+      form.addEventListener('submit', e => { e.preventDefault(); submitTask(form, task); });
+      sheet.querySelector('[data-action=delete-task]')?.addEventListener('click', () => deleteTask(task));
+      if (!isEdit) setTimeout(() => form.title.focus(), 50);
+    });
+}
+
+function submitTask(form, existing){
+  const td = today();
+  // Falls zwischenzeitlich ein Abgleich lief: aktuelles Objekt verwenden
+  if (existing) existing = state.tasks.find(t => t.id === existing.id);
+  const val = n => form.querySelector(`[name=${n}]`)?.value;
+  const title = form.title.value.trim();
+  if (!title){ form.title.focus(); return toast('Bitte einen Titel eingeben'); }
+  const type = form.querySelector('[name=ftype]:checked').value;
+  const freq = {type, every: Math.max(1, parseInt(val('every')) || 1)};
+  if (type === 'weekly'){
+    freq.days = [...form.querySelectorAll('[name=days]:checked')].map(x => +x.value);
+    if (!freq.days.length) return toast('Bitte mindestens einen Wochentag wählen');
+  }
+  if (type === 'monthly') freq.dom = Math.min(31, Math.max(1, parseInt(val('dom')) || 1));
+  if (type === 'once' || type === 'yearly'){
+    freq.date = val('date');
+    if (!freq.date || freq.date < td) return toast('Bitte ein Datum ab heute wählen');
+  }
+  if (['weekdays','once','yearly'].includes(type)) freq.every = 1;
+  let start = ['once','yearly'].includes(type) ? td : (val('start') || td);
+  if (start < td) start = td;
+  const data = {
+    title, desc: form.desc.value.trim(), cat: val('cat') ? form.querySelector('[name=cat]:checked').value : 'sonstiges',
+    mins: Math.max(0, parseInt(val('mins')) || 0),
+    assignee: form.querySelector('[name=who]:checked').value,
+    altStart: form.querySelector('[name=altStart]:checked')?.value || 'a',
+    freq,
+  };
+
+  if (!existing){
+    const id = uid();
+    state.tasks.push({id, sid:id, origin:start, start, end:null, created:Date.now(), ...data});
+    toast('Aufgabe angelegt');
+  } else if (existing.start >= td){
+    // Noch nicht begonnen: direkt anpassen
+    Object.assign(existing, data, {start});
+    if (!state.tasks.some(t => t.sid === existing.sid && t !== existing)) existing.origin = start;
+    toast('Gespeichert');
+  } else {
+    // Bereits laufend: alte Version endet, neue Version gilt ab "start"
+    existing.end = addDays(start, -1);
+    const rhythmChanged = existing.freq.type !== freq.type || (existing.freq.every || 1) !== freq.every;
+    state.tasks.push({id:uid(), sid:existing.sid, origin: rhythmChanged ? start : existing.origin, start, end:null, created:Date.now(), ...data});
+    toast(start === td ? 'Gespeichert – gilt ab heute' : `Gespeichert – gilt ab ${fmtShort(start)}`);
+  }
+  save(); closeModal(); render();
+}
+
+function deleteTask(task){
+  const td = today();
+  if (!confirm(`„${task.title}“ wirklich löschen?\nVergangene Einträge bleiben erhalten.`)) return;
+  task = state.tasks.find(t => t.id === task.id);
+  if (!task) return closeModal();
+  if (task.start >= td) state.tasks = state.tasks.filter(t => t !== task);
+  else task.end = addDays(td, -1);
+  save(); closeModal(); render(); toast('Aufgabe gelöscht');
+}
+
+/* ---------- Einzelnen Termin ansehen ---------- */
+function openInstance(i){
+  const t = i.task, c = cat(t.cat);
+  const when = i.key.includes('|W') ? `Woche ${isoWeek(i.date)} (flexibel)` : i.key.includes('|M') ? `${fmt(i.date, {month:'long', year:'numeric'})} (flexibel)` : fmtLong(i.date);
+  const wopt = k => `<label class="opt who who-${k}"><input type="radio" name="ow" value="${k}" ${i.who === k ? 'checked' : ''}><span>${esc(whoName(k))}</span></label>`;
+  openModal(`
+    <div class="sheet-head"><h2>${c.icon} ${esc(t.title)}</h2><button class="icon-btn" data-action="close">✕</button></div>
+    <div class="item-meta" style="font-size:14px"><span>📆 ${esc(when)}</span><span>↻ ${esc(freqText(t))}</span>${t.mins ? `<span>⏱ ${t.mins} min</span>` : ''}<span>${c.name}</span></div>
+    ${t.desc ? `<div class="det-desc">${esc(t.desc)}</div>` : ''}
+    <div class="actions" style="margin-top:14px">
+      <button class="btn" data-action="edit" data-id="${t.id}" style="margin-right:auto">Aufgabe bearbeiten</button>
+      <button class="btn primary" id="toggleBtn">${i.done ? 'Wieder öffnen' : '✓ Erledigt'}</button>
+    </div>
+    <div class="section"><h3>Übernehmen / tauschen</h3></div>
+    <form id="handover" class="card" style="box-shadow:none;background:var(--bg)">
+      <div class="field" style="margin-top:0"><span>Wer übernimmt?</span><div class="opts">${wopt('a')}${wopt('b')}${wopt('both')}</div></div>
+      <div class="field"><span>Für welchen Zeitraum?</span><div class="opts">
+        ${opt('scope','one','Nur dieser Termin',true)}${opt('scope','range','Zeitraum bis …',false)}${opt('scope','from','Dauerhaft ab hier',false)}
+      </div></div>
+      <label class="field" data-scope="range"><span>Bis einschließlich</span><input type="date" name="until" min="${i.date}" value="${addDays(i.date, 13)}"><small>z. B. Urlaub, Krankheit oder Dienstreise – danach gilt wieder die normale Zuständigkeit.</small></label>
+      <div class="hint" data-scope="from">Die Aufgabe wechselt ab ${esc(fmtShort(i.date < today() ? today() : i.date))} dauerhaft. Vergangene Termine bleiben unverändert.</div>
+      <div class="actions" style="margin-top:12px">
+        ${i.overridden ? '<button type="button" class="btn" id="resetOw" style="margin-right:auto">↺ Tausch zurücksetzen</button>' : ''}
+        <button type="submit" class="btn primary">Übernehmen</button>
+      </div>
+      <small style="color:var(--muted)">Standard-Zuständigkeit: ${esc(whoName(t.assignee))}</small>
+    </form>`, sheet => {
+      const form = sheet.querySelector('#handover');
+      const sync = () => {
+        const sc = form.querySelector('[name=scope]:checked').value;
+        form.querySelectorAll('[data-scope]').forEach(el => el.hidden = el.dataset.scope !== sc);
+      };
+      form.addEventListener('change', sync); sync();
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        const w = form.querySelector('[name=ow]:checked').value;
+        const sc = form.querySelector('[name=scope]:checked').value;
+        if (sc === 'one') setOverride(t, i.key, i.date, w);
+        else if (sc === 'range'){
+          const until = form.until.value;
+          if (!until || until < i.date) return toast('Bitte ein gültiges Enddatum wählen');
+          handoverRange(t, i.date, until, w);
+        } else handoverFrom(t, i.date < today() ? today() : i.date, w);
+        save(); closeModal(); render();
+        toast(`${whoName(w)} übernimmt ${sc === 'one' ? 'diesen Termin' : sc === 'range' ? `bis ${fmtShort(form.until.value)}` : 'ab jetzt dauerhaft'}`);
+      });
+      sheet.querySelector('#resetOw')?.addEventListener('click', () => {
+        delete state.overrides[i.key]; save(); closeModal(); render(); toast('Zurückgesetzt');
+      });
+      sheet.querySelector('#toggleBtn').addEventListener('click', () => { toggleDone(i.key); closeModal(); });
+    });
+}
+
+/* ---------- Übergabe: einzeln, Zeitraum, dauerhaft ---------- */
+function setOverride(t, key, d, w){
+  delete state.overrides[key];
+  if (makeInst(t, key, d).who !== w) state.overrides[key] = w;
+}
+function handoverRange(t, from, until, w){
+  const versions = state.tasks.filter(v => v.sid === t.sid);
+  const type = t.freq.type;
+  for (let d = from, n = 0; d <= until && n < 731; d = addDays(d, 1), n++){
+    versions.forEach(v => {
+      if (DAY_TYPES.includes(type) && v.freq.type === type && occursOn(v, d)) setOverride(v, `${v.sid}|${d}`, d, w);
+      if (v.freq.type === 'weekflex' && dow(d) === 0 && active(v, d, addDays(d, 6))) setOverride(v, `${v.sid}|W${d}`, d, w);
+      if (v.freq.type === 'monthflex' && d.endsWith('-01') && active(v, d, d)) setOverride(v, `${v.sid}|M${d.slice(0,7)}`, d, w);
+    });
+  }
+  // Flexible Aufgaben: auch die laufende Woche bzw. den laufenden Monat erfassen
+  versions.forEach(v => {
+    if (v.freq.type === 'weekflex') setOverride(v, `${v.sid}|W${monday(from)}`, monday(from), w);
+    if (v.freq.type === 'monthflex') setOverride(v, `${v.sid}|M${from.slice(0,7)}`, from.slice(0,7) + '-01', w);
+  });
+}
+function handoverFrom(t, from, w){
+  const versions = state.tasks.filter(v => v.sid === t.sid);
+  // Für flexible Aufgaben zählt die laufende Woche bzw. der laufende Monat bereits mit
+  versions.forEach(v => {
+    if (v.freq.type === 'weekflex') setOverride(v, `${v.sid}|W${monday(from)}`, monday(from), w);
+    if (v.freq.type === 'monthflex') setOverride(v, `${v.sid}|M${from.slice(0,7)}`, from.slice(0,7) + '-01', w);
+  });
+  versions.forEach(v => {
+    if (v.end && v.end < from) return;
+    if (v.start >= from){ v.assignee = w; return; }
+    // laufende Version teilen: bisher alt, ab "from" neu
+    const next = {...JSON.parse(JSON.stringify(v)), id:uid(), start:from, assignee:w, created:Date.now()};
+    v.end = addDays(from, -1);
+    state.tasks.push(next);
+  });
+  // Einzel-Tauschs ab diesem Tag, die nun der neuen Person entsprechen, aufräumen
+  Object.keys(state.overrides).forEach(k => {
+    const [sid, p] = k.split('|');
+    if (sid === t.sid && state.overrides[k] === w && (p.replace(/^[WM]/, '') >= from)) delete state.overrides[k];
+  });
+}
+
+function toggleDone(key){
+  if (state.done[key]) delete state.done[key];
+  else { state.done[key] = {at: Date.now()}; }
+  save(); render();
+}
+
+/* ---------- Einstellungen ---------- */
+function openSettings(first){
+  const sw = (k) => `<div class="swatches">${COLORS.map(c => `<label class="opt"><input type="radio" name="c${k}" value="${c}" ${P(k).color === c ? 'checked' : ''}><span style="background:${c}"></span></label>`).join('')}</div>`;
+  openModal(`
+    <div class="sheet-head"><h2>${first ? 'Willkommen bei „Wir zwei“ 👋' : 'Einstellungen'}</h2>${first ? '' : '<button class="icon-btn" data-action="close">✕</button>'}</div>
+    ${first ? '<p style="color:var(--muted);margin-top:0">Plant gemeinsam, wer was übernimmt – damit der Mental Load fair verteilt ist. Wie heißt ihr, und welche Farbe soll jede Person haben?</p>' : ''}
+    <form id="setForm">
+      <div class="row2">
+        <div><label class="field"><span>Person 1</span><input name="na" maxlength="20" value="${esc(P('a').name)}"></label>${sw('a')}</div>
+        <div><label class="field"><span>Person 2</span><input name="nb" maxlength="20" value="${esc(P('b').name)}"></label>${sw('b')}</div>
+      </div>
+      ${first ? `<label class="opt" style="display:block;margin-top:18px"><input type="checkbox" name="examples" checked><span>✨ Mit Beispielaufgaben starten (lassen sich jederzeit ändern oder löschen)</span></label>` : ''}
+      <div class="actions">
+        ${first ? '<button type="button" class="btn" data-action="sync-join" style="margin-right:auto">🔗 Schon eingerichtet? Gerät verbinden</button>' : ''}
+        <button type="submit" class="btn primary">${first ? 'Los geht’s' : 'Speichern'}</button></div>
+    </form>
+    ${first ? '' : `
+    <div id="syncSection">${syncSectionHTML()}</div>
+    <div class="section"><h3>Datensicherung</h3></div>
+    <p style="color:var(--muted);font-size:14px;margin:0 0 10px">Alles wird automatisch auf diesem Gerät im Browser gespeichert. Erstellt zur Sicherheit ab und zu ein Backup – damit könnt ihr die Daten auch auf ein anderes Gerät übertragen.</p>
+    <div class="actions" style="justify-content:flex-start;margin-top:0">
+      <button class="btn" data-action="export">⬇️ Backup exportieren</button>
+      <button class="btn" data-action="import">⬆️ Backup importieren</button>
+      <input type="file" id="importFile" accept=".json,application/json" hidden>
+    </div>
+    <div class="section"><h3>Sonstiges</h3></div>
+    <div class="actions" style="justify-content:flex-start;margin-top:0">
+      <button class="btn" data-action="examples">✨ Beispielaufgaben hinzufügen</button>
+      <button class="btn" data-action="reset" style="color:#dc2626">Alles zurücksetzen</button>
+    </div>`}`, sheet => {
+      const form = sheet.querySelector('#setForm');
+      form.addEventListener('change', () => {
+        document.documentElement.style.setProperty('--a', form.querySelector('[name=ca]:checked').value);
+        document.documentElement.style.setProperty('--b', form.querySelector('[name=cb]:checked').value);
+      });
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        state.people.a = {name: form.na.value.trim() || 'Person 1', color: form.querySelector('[name=ca]:checked').value};
+        state.people.b = {name: form.nb.value.trim() || 'Person 2', color: form.querySelector('[name=cb]:checked').value};
+        if (first){
+          state.setupDone = true;
+          if (form.examples.checked) addExamples();
+        }
+        save(); closeModal(); render(); toast('Gespeichert');
+      });
+      sheet.querySelector('#importFile')?.addEventListener('change', importBackup);
+    });
+}
+
+function exportBackup(){
+  const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `wirzwei-backup-${today()}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  toast('Backup erstellt');
+}
+function importBackup(e){
+  const file = e.target.files[0]; if (!file) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const data = JSON.parse(r.result);
+      if (!data.tasks || !data.people) throw new Error();
+      if (!confirm('Backup laden? Die aktuellen Daten auf diesem Gerät werden ersetzt.')) return;
+      state = Object.assign(defaultState(), data, {setupDone:true});
+      save(); closeModal(); render(); toast('Backup geladen');
+    } catch(err){ toast('Datei konnte nicht gelesen werden'); }
+  };
+  r.readAsText(file);
+}
+
+function addExamples(){
+  const td = today();
+  const mk = (title, desc, catId, mins, assignee, freq) => {
+    const id = uid();
+    state.tasks.push({id, sid:id, origin:td, start:td, end:null, created:Date.now(), title, desc, cat:catId, mins, assignee, altStart:'a', freq:Object.assign({every:1}, freq)});
+  };
+  mk('Spülmaschine ausräumen', '', 'haushalt', 10, 'alt', {type:'daily'});
+  mk('Brotdosen & Kita-Tasche packen', 'Wechselkleidung, Trinkflasche, Snack', 'kinder', 15, 'a', {type:'weekdays'});
+  mk('Wäsche waschen & aufhängen', '', 'haushalt', 30, 'b', {type:'weekly', days:[0,3]});
+  mk('Wocheneinkauf', 'Einkaufsliste vorher gemeinsam checken', 'essen', 60, 'both', {type:'weekly', days:[5]});
+  mk('Essensplan für die Woche', 'Was kochen wir? Was fehlt?', 'essen', 20, 'alt', {type:'weekly', days:[6]});
+  mk('Bettwäsche wechseln', '', 'haushalt', 30, 'alt', {type:'weekflex'});
+  mk('Kita-/Schul-Infos & Elternbriefe sichten', 'Termine in den Kalender übertragen', 'orga', 15, 'b', {type:'weekflex'});
+  mk('Rechnungen & Kontoauszüge prüfen', '', 'finanzen', 30, 'a', {type:'monthly', dom:1});
+  mk('Arzt- & Vorsorgetermine checken', 'U-Untersuchungen, Impfungen, Zahnarzt', 'gesundheit', 20, 'b', {type:'monthflex'});
+  mk('Geburtstage & Geschenke planen', 'Kindergeburtstage, Familie, Freunde', 'orga', 30, 'alt', {type:'monthflex'});
+}
+
+/* ---------- Toast & Banner ---------- */
+let toastTimer;
+function toast(msg){
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+}
+function showBanner(msg){ const b = $('#banner'); b.textContent = msg; b.hidden = false; }
+
+/* =========================================================
+   Ereignisse
+   ========================================================= */
+function step(dir){
+  const c = ui.cursor;
+  if (ui.view === 'day') ui.cursor = addDays(c, dir);
+  else if (ui.view === 'week' || (ui.view === 'balance' && ui.balRange === 'week')) ui.cursor = addDays(c, 7*dir);
+  else ui.cursor = addMonths(c, dir);
+  render();
+}
+
+document.addEventListener('click', e => {
+  const tab = e.target.closest('#tabs button');
+  if (tab){ ui.view = tab.dataset.view; saveUI(); render(); window.scrollTo({top:0}); return; }
+  if (e.target === $('#modal')) return closeModal();
+  const el = e.target.closest('[data-action]'); if (!el) return;
+  const act = el.dataset.action;
+  const key = el.closest('[data-key]')?.dataset.key;
+  switch (act){
+    case 'toggle': {
+      e.stopPropagation(); toggleDone(key);
+      if (state.done[key]) toast('Erledigt ✓');
+      break;
+    }
+    case 'open':     openInstance(instIndex.get(key)); break;
+    case 'new':      openTaskForm(); break;
+    case 'edit':     openTaskForm(state.tasks.find(t => t.id === el.dataset.id)); break;
+    case 'close':    closeModal(); break;
+    case 'settings': openSettings(false); break;
+    case 'filter':   ui.filter = el.dataset.f; saveUI(); render(); break;
+    case 'prev':     step(-1); break;
+    case 'next':     step(1); break;
+    case 'now':      ui.cursor = today(); render(); break;
+    case 'goday':    ui.cursor = el.dataset.date; ui.view = 'day'; render(); window.scrollTo({top:0}); break;
+    case 'balrange': ui.balRange = el.dataset.r; saveUI(); render(); break;
+    case 'sync-create': openSyncCreate(); break;
+    case 'sync-join':   openSyncJoin(); break;
+    case 'sync-share':  openSyncShare(); break;
+    case 'sync-back':   openSettings(!state.setupDone); break;
+    case 'sync-leave':
+      if (confirm('Dieses Gerät vom Abgleich trennen?\nDie Aufgaben bleiben auf dem Gerät, werden aber nicht mehr mit den anderen abgeglichen.')){
+        stopSync(); openSettings(false); toast('Verbindung getrennt');
+      }
+      break;
+    case 'export':   exportBackup(); break;
+    case 'import':   $('#importFile').click(); break;
+    case 'examples': addExamples(); save(); closeModal(); render(); toast('Beispiele hinzugefügt'); break;
+    case 'reset':
+      if (confirm(`Wirklich ALLE Aufgaben und Erledigt-Häkchen löschen?${sync ? '\nAchtung: Das gilt für ALLE verbundenen Geräte!' : ''}`) && confirm('Sicher? Das kann nicht rückgängig gemacht werden.')){
+        state = defaultState(); save(); $('#modal').hidden = true; render(); openSettings(true);
+      }
+      break;
+  }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// Wischen zum Blättern (Tag/Woche/Monat)
+let tx = null, ty = null;
+$('#view').addEventListener('touchstart', e => { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, {passive:true});
+$('#view').addEventListener('touchend', e => {
+  if (tx === null || ui.view === 'tasks') return;
+  const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
+  if (Math.abs(dx) > 70 && Math.abs(dy) < 50) step(dx < 0 ? 1 : -1);
+  tx = null;
+}, {passive:true});
+
+// Bei Rückkehr in die App: auf "heute" aktualisieren, falls der Tag gewechselt hat
+let lastDay = today();
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && today() !== lastDay){ lastDay = today(); ui.cursor = today(); render(); }
+});
+
+/* =========================================================
+   Synchronisierung über Firebase Realtime Database
+   Prinzip: Jede Aufgabe, jedes Häkchen und jeder Tausch ist ein eigener
+   Eintrag in der Cloud. Geändert werden nur die Einträge, die sich
+   gegenüber dem letzten bekannten Cloud-Stand ("base") geändert haben –
+   so können Tablet und Handys gleichzeitig arbeiten, auch offline.
+   ========================================================= */
+const SYNCKEY = 'wirzwei.sync', BASEKEY = 'wirzwei.base', DIRTYKEY = 'wirzwei.dirty';
+const FB_SDK = 'https://www.gstatic.com/firebasejs/10.12.2/';
+const QR_LIB = 'https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js';
+const lsGet = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch(e) { return d; } };
+const lsSet = (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} };
+
+let sync  = lsGet(SYNCKEY, null);   // {config, family}
+let base  = lsGet(BASEKEY, null);   // letzter Cloud-Stand (flach); null = Cloud komplett übernehmen
+let dirty = lsGet(DIRTYKEY, {});    // gesendete, aber noch nicht bestätigte Pfade
+let fbApp = null, famRef = null, syncStatus = sync ? 'connecting' : 'off', syncError = '', pushSeq = 0;
+
+const normPeople = p => ({
+  a: {name: String(p?.a?.name || 'Person 1'), color: p?.a?.color || '#6366f1'},
+  b: {name: String(p?.b?.name || 'Person 2'), color: p?.b?.color || '#f97316'},
+});
+const normTask = t => ({
+  id:t.id, sid:t.sid || t.id, origin:t.origin || t.start, start:t.start, end:t.end || null, created:t.created || 0,
+  title:t.title || '', desc:t.desc || '', cat:t.cat || 'sonstiges', mins:t.mins || 0,
+  assignee:t.assignee || 'a', altStart:t.altStart || 'a',
+  freq:{type:t.freq.type, every:t.freq.every || 1, days:[...(t.freq.days || [])], dom:t.freq.dom || 1, date:t.freq.date || ''},
+});
+function flatten(s){
+  const m = {people: JSON.stringify(normPeople(s.people))};
+  s.tasks.forEach(t => m['tasks/' + t.id] = JSON.stringify(normTask(t)));
+  for (const k in s.done) m['done/' + k] = JSON.stringify({at: s.done[k]?.at || 0});
+  for (const k in s.overrides) m['overrides/' + k] = JSON.stringify(String(s.overrides[k]));
+  return m;
+}
+function unflatten(m){
+  const s = {people: normPeople(null), tasks: [], done: {}, overrides: {}};
+  for (const [p, v] of Object.entries(m)){
+    const val = JSON.parse(v), i = p.indexOf('/'), sec = i < 0 ? p : p.slice(0, i), k = p.slice(i + 1);
+    if (p === 'people') s.people = val;
+    else if (sec === 'tasks') s.tasks.push(val);
+    else if (sec === 'done') s.done[k] = val;
+    else if (sec === 'overrides') s.overrides[k] = val;
+  }
+  s.tasks.sort((x, y) => x.created - y.created);
+  return s;
+}
+const remoteFlat = val => flatten({
+  people: val?.people,
+  tasks: Object.values(val?.tasks || {}).filter(t => t && t.freq).map(normTask),
+  done: val?.done || {}, overrides: val?.overrides || {},
+});
+function diffFlat(b, c){
+  const out = {};
+  for (const p in c) if (b[p] !== c[p]) out[p] = c[p];
+  for (const p in b) if (!(p in c)) out[p] = null;
+  return out;
+}
+
+function onRemote(snap){
+  const remote = remoteFlat(snap.val());
+  const merged = {...remote}, toPush = {};
+  if (base){
+    const local = flatten(state);
+    const pending = diffFlat(base, local);
+    for (const k in dirty) if (!(k in pending)) pending[k] = k in local ? local[k] : null;
+    for (const [p, v] of Object.entries(pending)){
+      if (v === null) delete merged[p]; else merged[p] = v;
+      if ((remote[p] ?? null) !== v) toPush[p] = v;
+    }
+  } else { dirty = {}; lsSet(DIRTYKEY, dirty); }
+  base = remote; lsSet(BASEKEY, base);
+  Object.assign(state, unflatten(merged), {setupDone: true});
+  saveLocal();
+  if (Object.keys(toPush).length) pushPaths(toPush);
+  render();
+}
+function pushPaths(p){
+  if (!famRef) return;
+  const obj = {}, mine = {};
+  for (const [k, v] of Object.entries(p)){
+    obj[k] = v === null ? null : JSON.parse(v);
+    mine[k] = dirty[k] = `${Date.now()}-${++pushSeq}`;
+  }
+  lsSet(DIRTYKEY, dirty);
+  famRef.update(obj).then(() => {
+    for (const k in mine) if (dirty[k] === mine[k]) delete dirty[k];
+    lsSet(DIRTYKEY, dirty);
+  }).catch(e => setStatus('error', e.message));
+}
+function pushSync(){
+  if (!famRef || !base) return;
+  const p = diffFlat(base, flatten(state));
+  if (Object.keys(p).length) pushPaths(p);
+}
+
+function loadScript(src){
+  return new Promise((res, rej) => {
+    if (document.querySelector(`script[src="${src}"]`)) return res();
+    const s = document.createElement('script');
+    s.src = src; s.onload = res; s.onerror = () => { s.remove(); rej(new Error('Skript konnte nicht geladen werden (offline?)')); };
+    document.head.appendChild(s);
+  });
+}
+async function startSync(){
+  if (!sync || famRef) return;
+  setStatus('connecting');
+  try {
+    for (const f of ['firebase-app-compat.js', 'firebase-auth-compat.js', 'firebase-database-compat.js']) await loadScript(FB_SDK + f);
+    fbApp = firebase.apps.find(a => a.name === 'wirzwei') || firebase.initializeApp(sync.config, 'wirzwei');
+    const auth = fbApp.auth();
+    const user = await new Promise(r => { const off = auth.onAuthStateChanged(u => { off(); r(u); }); });
+    if (!user) await auth.signInAnonymously();
+    const db = fbApp.database();
+    db.ref('.info/connected').on('value', s => { if (syncStatus !== 'error') setStatus(s.val() ? 'online' : 'offline'); });
+    famRef = db.ref('families/' + sync.family);
+    famRef.on('value', onRemote, e => { famRef = null; setStatus('error', 'Zugriff verweigert. Sind die Datenbank-Regeln aus der Anleitung veröffentlicht? (' + e.message + ')'); });
+  } catch(e){
+    famRef = null;
+    const msg = String(e.message || e);
+    if (/admin-restricted|operation-not-allowed/.test(msg)) setStatus('error', 'Anonyme Anmeldung ist in Firebase nicht aktiviert (Anleitung Schritt 4).');
+    else setStatus(navigator.onLine ? 'error' : 'offline', msg);
+  }
+}
+function stopSync(){
+  try { famRef && famRef.off(); } catch(e) {}
+  try { fbApp && fbApp.delete(); } catch(e) {}
+  famRef = null; fbApp = null; sync = null; base = null; dirty = {};
+  lsSet(SYNCKEY, null); lsSet(BASEKEY, null); lsSet(DIRTYKEY, null);
+  setStatus('off');
+}
+function connect(config, family, asNew){
+  stopSync();
+  sync = {config, family};
+  base = asNew ? {} : null;   // neu: alles hochladen · beitreten: Cloud übernehmen
+  lsSet(SYNCKEY, sync); lsSet(BASEKEY, base);
+  startSync();
+}
+window.addEventListener('online', () => { if (sync && !famRef) startSync(); });
+
+function setStatus(s, err = ''){
+  syncStatus = s; syncError = s === 'error' ? err : '';
+  const ind = $('#syncInd');
+  ind.hidden = s === 'off';
+  ind.querySelector('.sdot').className = 'sdot ' + s;
+  ind.title = statusText();
+  const sec = $('#syncSection'); if (sec) sec.innerHTML = syncSectionHTML();
+}
+function statusText(){
+  return ({online:'Verbunden – alles wird automatisch abgeglichen', offline:'Offline – Änderungen werden später übertragen',
+    connecting:'Verbinde …', error:'Verbindungsproblem', off:'Nicht verbunden'})[syncStatus];
+}
+function syncSectionHTML(){
+  const head = '<div class="section"><h3>Geräte verbinden</h3></div>';
+  if (!sync) return head + `
+    <p class="muted">Gleicht Aufgaben, Häkchen und Tausche zwischen Tablet und Handys ab – über eure eigene, kostenlose Firebase-Datenbank. Wie das eingerichtet wird, steht in der Anleitung.</p>
+    <div class="actions start">
+      <button class="btn" data-action="sync-create">☁️ Neue Familie anlegen</button>
+      <button class="btn" data-action="sync-join">🔗 Mit Familie verbinden</button>
+    </div>`;
+  return head + `
+    <div class="syncbox"><span class="sdot ${syncStatus}"></span>${esc(statusText())}</div>
+    ${syncError ? `<div class="hint" style="color:#dc2626;margin-bottom:10px">${esc(syncError)}</div>` : ''}
+    <div class="actions start">
+      <button class="btn" data-action="sync-share">📱 Weiteres Gerät verbinden</button>
+      <button class="btn" data-action="sync-leave">Verbindung trennen</button>
+    </div>`;
+}
+
+function parseConfig(text){
+  const c = {};
+  text.replace(/["']?(\w+)["']?\s*:\s*["']([^"']+)["']/g, (_, k, v) => { c[k] = v; });
+  if (!c.apiKey || !c.projectId) return {error:'Das sieht nicht nach einer Firebase-Konfiguration aus (apiKey/projectId fehlen).'};
+  if (!c.databaseURL) return {error:'In der Konfiguration fehlt „databaseURL“. Bitte zuerst die Realtime Database anlegen (Schritt 2) und die Konfiguration danach erneut kopieren.'};
+  return {config:{apiKey:c.apiKey, authDomain:c.authDomain || `${c.projectId}.firebaseapp.com`, databaseURL:c.databaseURL, projectId:c.projectId, appId:c.appId || ''}};
+}
+function newFamilyKey(){
+  const chars = 'abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789', r = new Uint32Array(32);
+  crypto.getRandomValues(r);
+  return [...r].map(x => chars[x % chars.length]).join('');
+}
+const encodeCode = () => btoa(unescape(encodeURIComponent(JSON.stringify({c:sync.config, f:sync.family})))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+function decodeCode(code){
+  try {
+    const s = code.trim().replace(/^.*join=/, '').replace(/-/g,'+').replace(/_/g,'/');
+    const d = JSON.parse(decodeURIComponent(escape(atob(s))));
+    return d.c && d.c.databaseURL && d.f && d.f.length >= 24 ? d : null;
+  } catch(e) { return null; }
+}
+
+function openSyncCreate(){
+  openModal(`
+    <div class="sheet-head"><h2>☁️ Neue Familie anlegen</h2><button class="icon-btn" data-action="sync-back">✕</button></div>
+    <p class="muted">Füge hier die Firebase-Konfiguration ein (Anleitung, Schritt 5). Du kannst den ganzen Codeblock einfügen – die App sucht sich die nötigen Angaben heraus.</p>
+    <label class="field"><span>Firebase-Konfiguration</span><textarea id="cfg" rows="9" class="code" placeholder="const firebaseConfig = {&#10;  apiKey: &quot;…&quot;,&#10;  authDomain: &quot;…&quot;,&#10;  databaseURL: &quot;…&quot;,&#10;  …&#10;};"></textarea></label>
+    <div class="hint" id="cfgMsg">Die Aufgaben dieses Geräts werden in die neue Familie übernommen. Danach könnt ihr die Handys per QR-Code verbinden.</div>
+    <div class="actions"><button class="btn" data-action="sync-back">Abbrechen</button><button class="btn primary" id="cfgGo">Verbinden</button></div>`, sheet => {
+      sheet.querySelector('#cfgGo').addEventListener('click', () => {
+        const r = parseConfig(sheet.querySelector('#cfg').value);
+        if (r.error){ const m = sheet.querySelector('#cfgMsg'); m.textContent = '⚠️ ' + r.error; m.style.color = '#dc2626'; return; }
+        connect(r.config, newFamilyKey(), true);
+        openSyncShare();
+        toast('Familie angelegt');
+      });
+    });
+}
+function openSyncJoin(){
+  openModal(`
+    <div class="sheet-head"><h2>🔗 Mit Familie verbinden</h2><button class="icon-btn" data-action="sync-back">✕</button></div>
+    <p class="muted">Am einfachsten: Auf dem schon verbundenen Gerät unter ⚙ → „Weiteres Gerät verbinden“ den QR-Code mit der Handykamera scannen. Alternativ hier den Verbindungscode einfügen:</p>
+    <label class="field"><span>Verbindungscode oder -link</span><textarea id="jcode" rows="5" class="code"></textarea></label>
+    <div class="hint" id="jMsg">Die Aufgaben auf diesem Gerät werden durch die gemeinsamen ersetzt.</div>
+    <div class="actions"><button class="btn" data-action="sync-back">Abbrechen</button><button class="btn primary" id="jGo">Verbinden</button></div>`, sheet => {
+      sheet.querySelector('#jGo').addEventListener('click', () => {
+        const d = decodeCode(sheet.querySelector('#jcode').value);
+        if (!d){ const m = sheet.querySelector('#jMsg'); m.textContent = '⚠️ Der Code ist ungültig oder unvollständig.'; m.style.color = '#dc2626'; return; }
+        joinFamily(d);
+      });
+    });
+}
+function joinFamily(d){
+  connect(d.c, d.f, false);
+  state.setupDone = true; saveLocal();
+  $('#modal').hidden = true; render();
+  toast('Verbunden – Daten werden geladen …');
+}
+function openSyncShare(){
+  const code = encodeCode();
+  const link = location.protocol === 'https:' ? location.href.split('#')[0] + '#join=' + code : '';
+  openModal(`
+    <div class="sheet-head"><h2>📱 Weiteres Gerät verbinden</h2><button class="icon-btn" data-action="sync-back">✕</button></div>
+    ${link ? `<p class="muted">Mit der Kamera des Handys scannen und den Link öffnen – fertig.</p><div class="qr" id="qr">QR-Code wird erstellt …</div>`
+           : `<div class="hint">Die App läuft gerade als lokale Datei. Für den QR-Code bitte die App über ihre Webadresse öffnen (Anleitung, Teil 2). Der Code unten funktioniert trotzdem.</div>`}
+    <label class="field"><span>Oder Verbindungscode${link ? '-Link' : ''} teilen</span><textarea rows="4" class="code" readonly id="shareCode">${esc(link || code)}</textarea></label>
+    <div class="hint">🔒 Wer diesen Code hat, kann eure Aufgaben sehen und ändern. Teilt ihn nur zwischen euren eigenen Geräten.</div>
+    <div class="actions"><button class="btn" id="copyCode">Kopieren</button><button class="btn primary" data-action="sync-back">Fertig</button></div>`, sheet => {
+      sheet.querySelector('#copyCode').addEventListener('click', () => {
+        const ta = sheet.querySelector('#shareCode'); ta.select();
+        (navigator.clipboard ? navigator.clipboard.writeText(ta.value) : Promise.reject()).catch(() => document.execCommand('copy'));
+        toast('Kopiert');
+      });
+      if (link) loadScript(QR_LIB).then(() => {
+        const q = qrcode(0, 'L'); q.addData(link); q.make();
+        sheet.querySelector('#qr').innerHTML = q.createSvgTag({cellSize:4, margin:0, scalable:true});
+      }).catch(() => { sheet.querySelector('#qr').textContent = 'QR-Code braucht Internet – bitte den Link unten nutzen.'; });
+    });
+}
+function checkJoinLink(){
+  const m = location.hash.match(/join=([\w-]+)/);
+  if (!m) return false;
+  history.replaceState(null, '', location.pathname + location.search);
+  const d = decodeCode(m[1]);
+  if (!d){ toast('Ungültiger Verbindungslink'); return false; }
+  if (sync && sync.family === d.f){ toast('Dieses Gerät ist bereits verbunden'); return true; }
+  if (!confirm('Dieses Gerät mit eurem Familienplaner verbinden?\nAufgaben auf diesem Gerät werden durch die gemeinsamen ersetzt.')) return false;
+  joinFamily(d);
+  return true;
+}
+
+/* =========================================================
+   Start
+   ========================================================= */
+if (!storageOK) showBanner('Dieser Browser erlaubt kein dauerhaftes Speichern (privater Modus?). Änderungen gehen beim Schließen verloren.');
+render();
+setStatus(syncStatus);
+const joined = checkJoinLink();
+if (!state.setupDone && !joined) openSettings(true);
+if (sync) startSync();
+if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+</body>
+</html>
