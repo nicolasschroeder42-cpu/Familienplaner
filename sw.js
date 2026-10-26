@@ -1,6 +1,6 @@
 // Offline-Unterstützung: App-Dateien und Firebase-Bibliothek werden zwischengespeichert,
-// damit "Wir zwei" auch ohne Internet startet. Daten gleicht die App selbst ab.
-const CACHE = 'wirzwei-v1';
+// damit der Familienplaner auch ohne Internet startet. Daten gleicht die App selbst ab.
+const CACHE = 'wirzwei-v2';
 const CORE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
