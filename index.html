@@ -283,8 +283,10 @@ const WD_LONG = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'
 const COLORS = ['#6366f1','#8b5cf6','#ec4899','#f43f5e','#f97316','#f59e0b','#10b981','#14b8a6','#0ea5e9','#64748b'];
 const CATS = [
   {id:'haushalt',   name:'Haushalt',        icon:'🧹'},
-  {id:'kinder',     name:'Kinder',          icon:'🧸'},
-  {id:'essen',      name:'Essen & Einkauf', icon:'🛒'},
+  {id:'kinder',     name:'Jorik',           icon:'🧸'},
+  {id:'essen',      name:'Einkaufen',       icon:'🛒'},
+  {id:'kochen',     name:'Kochen',          icon:'🍳'},
+  {id:'tiere',      name:'Tiere',           icon:'🐾'},
   {id:'orga',       name:'Organisation',    icon:'🗂️'},
   {id:'termine',    name:'Termine',         icon:'📅'},
   {id:'finanzen',   name:'Finanzen',        icon:'💶'},
@@ -1081,7 +1083,7 @@ function addExamples(){
   mk('Brotdosen & Kita-Tasche packen', 'Wechselkleidung, Trinkflasche, Snack', 'kinder', 15, 'a', {type:'weekdays'});
   mk('Wäsche waschen & aufhängen', '', 'haushalt', 30, 'b', {type:'weekly', days:[0,3]});
   mk('Wocheneinkauf', 'Einkaufsliste vorher gemeinsam checken', 'essen', 60, 'both', {type:'weekly', days:[5]});
-  mk('Essensplan für die Woche', 'Was kochen wir? Was fehlt?', 'essen', 20, 'alt', {type:'weekly', days:[6]});
+  mk('Essensplan für die Woche', 'Was kochen wir? Was fehlt?', 'kochen', 20, 'alt', {type:'weekly', days:[6]});
   mk('Bettwäsche wechseln', '', 'haushalt', 30, 'alt', {type:'weekflex'});
   mk('Kita-/Schul-Infos & Elternbriefe sichten', 'Termine in den Kalender übertragen', 'orga', 15, 'b', {type:'weekflex'});
   mk('Rechnungen & Kontoauszüge prüfen', '', 'finanzen', 30, 'a', {type:'monthly', dom:1});
