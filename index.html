@@ -234,6 +234,10 @@ main{max-width:1240px;margin:0 auto;padding:12px 16px}
   .tabs button{flex:1;justify-content:center;padding:9px 0}
 }
 @media (max-width:560px){
+  /* Knöpfe in der Aufgaben-Ansicht: volle Breite, untereinander */
+  .actions.stack{flex-direction:column;align-items:stretch}
+  .actions.stack .btn{width:100%;margin:0!important}
+  .actions.stack.rev{flex-direction:column-reverse}   /* Speichern oben, Löschen unten */
   .brand small{display:none}
   .filter{margin-left:0;width:100%}
   .datenav .lbl{font-size:17px}
@@ -286,7 +290,9 @@ const CATS = [
   {id:'kinder',     name:'Jorik',           icon:'🧸'},
   {id:'essen',      name:'Einkaufen',       icon:'🛒'},
   {id:'kochen',     name:'Kochen',          icon:'🍳'},
-  {id:'tiere',      name:'Tiere',           icon:'🐾'},
+  {id:'tiere',      name:'Pax&Rhonna',      icon:'🐈'},
+  {id:'pferde',     name:'Pferde',          icon:'🐎'},
+  {id:'muell',      name:'Müll',            icon:'🗑️'},
   {id:'orga',       name:'Organisation',    icon:'🗂️'},
   {id:'termine',    name:'Termine',         icon:'📅'},
   {id:'finanzen',   name:'Finanzen',        icon:'💶'},
@@ -746,7 +752,7 @@ function renderBalance(v){
     <div class="card">
       ${cats.length ? cats.map(c => {
         const x = byCat[c.id], t = x.a + x.b;
-        return `<div class="catrow"><div>${c.icon} ${c.name}</div>
+        return `<div class="catrow"><div>${c.icon} ${esc(c.name)}</div>
           <div class="catbar"><i style="width:${x.a/t*100}%;background:var(--a)"></i><i style="width:${x.b/t*100}%;background:var(--b)"></i></div>
           <div class="mins">${fmtMins(t)}</div></div>`;
       }).join('') : '<div style="color:var(--muted)">Noch keine Daten.</div>'}
@@ -805,14 +811,14 @@ function openTaskForm(task){
       <div class="field" data-for="daily weekly weekflex monthly monthflex"><span>Rhythmus</span>
         <div class="inline"><span>alle</span><input type="number" name="every" min="1" max="12" value="${t.freq.every || 1}"><span class="unit"></span></div></div>
       <div class="field"><span>Bereich</span><div class="opts">
-        ${CATS.map(c => opt('cat', c.id, `${c.icon} ${c.name}`, t.cat === c.id)).join('')}
+        ${CATS.map(c => opt('cat', c.id, `${c.icon} ${esc(c.name)}`, t.cat === c.id)).join('')}
       </div></div>
       <div class="row2">
         <label class="field"><span>Dauer (Minuten)</span><input type="number" name="mins" min="0" max="600" step="5" value="${t.mins ?? 15}"></label>
         <label class="field" data-for="daily weekdays weekly weekflex monthly monthflex"><span>Gilt ab</span><input type="date" name="start" min="${td}" value="${startVal}"></label>
       </div>
       ${isEdit && task.start < td ? `<div class="hint">ℹ️ Änderungen gelten erst ab dem gewählten Datum. Vergangene Tage und Erledigt-Häkchen bleiben unverändert.</div>` : `<div class="hint">ℹ️ Neue Aufgaben wirken nur in die Zukunft – frühestens ab heute.</div>`}
-      <div class="actions">
+      <div class="actions stack rev">
         ${isEdit ? '<button type="button" class="btn danger" data-action="delete-task">Löschen</button>' : ''}
         <button type="button" class="btn" data-action="close">Abbrechen</button>
         <button type="submit" class="btn primary">Speichern</button>
@@ -899,9 +905,9 @@ function openInstance(i){
   const wopt = k => `<label class="opt who who-${k}"><input type="radio" name="ow" value="${k}" ${i.who === k ? 'checked' : ''}><span>${esc(whoName(k))}</span></label>`;
   openModal(`
     <div class="sheet-head"><h2>${c.icon} ${esc(t.title)}</h2><button class="icon-btn" data-action="close">✕</button></div>
-    <div class="item-meta" style="font-size:14px"><span>📆 ${esc(when)}</span><span>↻ ${esc(freqText(t))}</span>${t.mins ? `<span>⏱ ${t.mins} min</span>` : ''}<span>${c.name}</span></div>
+    <div class="item-meta" style="font-size:14px"><span>📆 ${esc(when)}</span><span>↻ ${esc(freqText(t))}</span>${t.mins ? `<span>⏱ ${t.mins} min</span>` : ''}<span>${esc(c.name)}</span></div>
     ${t.desc ? `<div class="det-desc">${esc(t.desc)}</div>` : ''}
-    <div class="actions" style="margin-top:14px">
+    <div class="actions stack" style="margin-top:14px">
       <button class="btn" data-action="edit" data-id="${t.id}" style="margin-right:auto">Aufgabe bearbeiten</button>
       <button class="btn primary" id="toggleBtn">${i.done ? 'Wieder öffnen' : '✓ Erledigt'}</button>
     </div>
@@ -913,7 +919,7 @@ function openInstance(i){
       </div></div>
       <label class="field" data-scope="range"><span>Bis einschließlich</span><input type="date" name="until" min="${i.date}" value="${addDays(i.date, 13)}"><small>z. B. Urlaub, Krankheit oder Dienstreise – danach gilt wieder die normale Zuständigkeit.</small></label>
       <div class="hint" data-scope="from">Die Aufgabe wechselt ab ${esc(fmtShort(i.date < today() ? today() : i.date))} dauerhaft. Vergangene Termine bleiben unverändert.</div>
-      <div class="actions" style="margin-top:12px">
+      <div class="actions stack" style="margin-top:12px">
         ${i.overridden ? '<button type="button" class="btn" id="resetOw" style="margin-right:auto">↺ Tausch zurücksetzen</button>' : ''}
         <button type="submit" class="btn primary">Übernehmen</button>
       </div>
