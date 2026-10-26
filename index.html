@@ -792,7 +792,7 @@ function openTaskForm(task){
   openModal(`
     <div class="sheet-head"><h2>${isEdit ? 'Aufgabe bearbeiten' : 'Neue Aufgabe'}</h2><button class="icon-btn" data-action="close">✕</button></div>
     <form id="taskForm" autocomplete="off">
-      <label class="field"><span>Was ist zu tun?</span><input name="title" maxlength="80" value="${esc(t.title)}" placeholder="z. B. Brotdosen packen" required></label>
+      <label class="field"><span>Was ist zu tun?</span><input name="title" maxlength="80" value="${esc(t.title)}" placeholder="z. B. Badezimmer putzen" required></label>
       <label class="field"><span>Beschreibung <em>(optional)</em></span><textarea name="desc" rows="2" placeholder="Details, Hinweise, Ansprechpartner …">${esc(t.desc)}</textarea></label>
       <div class="field"><span>Wer ist zuständig?</span><div class="opts">
         ${whoOpt('a', P('a').name)}${whoOpt('b', P('b').name)}${whoOpt('both','Beide')}${whoOpt('alt','Abwechselnd')}
@@ -836,7 +836,8 @@ function openTaskForm(task){
       sync();
       form.addEventListener('submit', e => { e.preventDefault(); submitTask(form, task); });
       sheet.querySelector('[data-action=delete-task]')?.addEventListener('click', () => deleteTask(task));
-      if (!isEdit) setTimeout(() => form.title.focus(), 50);
+      // Nur mit Maus/PC direkt ins Feld springen – auf Touch-Geräten würde sonst sofort die Tastatur aufgehen
+      if (!isEdit && matchMedia('(pointer: fine)').matches) setTimeout(() => form.title.focus(), 50);
     });
 }
 
