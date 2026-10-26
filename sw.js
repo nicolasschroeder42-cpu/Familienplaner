@@ -1,11 +1,11 @@
 // Offline-Unterstützung: App-Dateien und Firebase-Bibliothek werden zwischengespeichert,
 // damit der Familienplaner auch ohne Internet startet. Daten gleicht die App selbst ab.
-const CACHE = 'wirzwei-v2';
+const CACHE = 'wirzwei-v3';
 const CORE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
   self.skipWaiting();
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)));
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE.map(u => new Request(u, {cache:'reload'})))));
 });
 
 self.addEventListener('activate', e => {
@@ -19,9 +19,9 @@ self.addEventListener('fetch', e => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
 
-  // Eigene Dateien: erst Netz (immer aktuelle Version), sonst Cache
+  // Eigene Dateien: erst Netz (immer aktuelle Version, am Browser-Cache vorbei), sonst Cache
   if (url.origin === location.origin){
-    e.respondWith(fetch(req)
+    e.respondWith(fetch(req.url, {cache:'no-cache'})
       .then(res => { const copy = res.clone(); caches.open(CACHE).then(c => c.put(req, copy)); return res; })
       .catch(() => caches.match(req, {ignoreSearch:true}).then(r => r || caches.match('./index.html'))));
     return;
