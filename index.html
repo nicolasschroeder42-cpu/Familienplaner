@@ -269,6 +269,8 @@ main{max-width:1240px;margin:0 auto;padding:12px 16px}
    ========================================================= */
 const KEY = 'wirzwei.v1';
 const UIKEY = 'wirzwei.ui';
+/* @core-start – dieser und der zweite markierte Abschnitt werden auch vom Benachrichtigungs-Skript (push-senden.js) genutzt */
+const VAPID_PUBLIC = 'BFgkpnjJk7CizgTOeD_9mGuPMLNyRVSy5MrTbA5Az0-IimqzsKBFKTrOgvREnK5GKK-WcaoXiOGoCDgE4wDsJU0';
 const WD = ['Mo','Di','Mi','Do','Fr','Sa','So'];
 const WD_LONG = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'];
 const COLORS = ['#6366f1','#8b5cf6','#ec4899','#f43f5e','#f97316','#f59e0b','#10b981','#14b8a6','#0ea5e9','#64748b'];
@@ -316,6 +318,7 @@ const fmtLong = s => fmt(s, {weekday:'long', day:'numeric', month:'long'});
 const cat = id => CATS.find(c => c.id === id) || CATS[CATS.length-1];
 const isoWeek = s => { const d = parse(s); d.setDate(d.getDate() + 3 - ((d.getDay()+6)%7)); const w1 = new Date(d.getFullYear(),0,4); return 1 + Math.round(((d - w1)/864e5 - 3 + ((w1.getDay()+6)%7)) / 7); };
 const fmtMins = m => m >= 60 ? `${Math.floor(m/60)} h${m%60 ? ' ' + (m%60) + ' min' : ''}` : `${m} min`;
+/* @core-end */
 
 /* =========================================================
    Zustand & Speicherung
@@ -367,6 +370,7 @@ const initials = w => w === 'both' ? '∞' : (P(w).name.trim()[0] || '?').toUppe
 /* =========================================================
    Wiederholungslogik
    ========================================================= */
+/* @core-start */
 const DAY_TYPES = ['once','daily','weekdays','weekly','monthly','yearly'];
 
 function active(t, from, to){ return t.start <= to && (!t.end || t.end >= from); }
@@ -451,6 +455,21 @@ function freqText(t){
   }
   return '';
 }
+
+// Text der Morgen-Benachrichtigung für Person p ('a' | 'b') am Tag d
+function buildDigest(p, d){
+  const mine = i => (i.who === p || i.who === 'both') && !i.done;
+  const day = sortInsts(dayInsts(d).filter(mine));
+  const over = overdueInsts().filter(mine);
+  const week = weekFlexInsts(monday(d)).filter(mine);
+  const list = arr => arr.slice(0, 4).map(i => i.task.title).join(', ') + (arr.length > 4 ? ' …' : '');
+  const name = state.people?.[p]?.name || '';
+  const parts = [day.length ? `Heute ${day.length === 1 ? '1 Aufgabe' : day.length + ' Aufgaben'}: ${list(day)}` : 'Heute steht nichts Festes für dich an. 🌿'];
+  if (over.length) parts.push(`⚠️ Überfällig: ${list(over)}`);
+  if (week.length) parts.push(`Diese Woche noch offen: ${list(week)}`);
+  return {title: `Guten Morgen${name ? ', ' + name : ''}! ☀️`, body: parts.join('\n')};
+}
+/* @core-end */
 
 /* =========================================================
    Rendering
@@ -989,6 +1008,7 @@ function openSettings(first){
     </div>
     <p class="muted" style="margin-top:8px">Gilt nur für dieses Gerät. „Automatisch“ folgt der Einstellung von Android.</p>
     <div id="syncSection">${syncSectionHTML()}</div>
+    <div id="pushSection">${pushSectionHTML()}</div>
     <div class="section"><h3>Datensicherung</h3></div>
     <p style="color:var(--muted);font-size:14px;margin:0 0 10px">Alles wird automatisch auf diesem Gerät im Browser gespeichert. Erstellt zur Sicherheit ab und zu ein Backup – damit könnt ihr die Daten auch auf ein anderes Gerät übertragen.</p>
     <div class="actions" style="justify-content:flex-start;margin-top:0">
@@ -1118,6 +1138,9 @@ document.addEventListener('click', e => {
         stopSync(); openSettings(false); toast('Verbindung getrennt');
       }
       break;
+    case 'push-on': case 'push-save': pushEnable(); break;
+    case 'push-off':  pushDisable(); break;
+    case 'push-test': pushTest(); break;
     case 'export':   exportBackup(); break;
     case 'import':   $('#importFile').click(); break;
     case 'examples': addExamples(); save(); closeModal(); render(); toast('Beispiele hinzugefügt'); break;
@@ -1271,6 +1294,10 @@ async function startSync(){
   }
 }
 function stopSync(){
+  if (pushCfg.on){
+    try { famRef && famRef.child('push/' + deviceId()).remove(); } catch(e) {}
+    pushCfg.on = false; lsSet(PUSHKEY, pushCfg);
+  }
   try { famRef && famRef.off(); } catch(e) {}
   try { fbApp && fbApp.delete(); } catch(e) {}
   famRef = null; fbApp = null; sync = null; base = null; dirty = {};
@@ -1293,6 +1320,7 @@ function setStatus(s, err = ''){
   ind.querySelector('.sdot').className = 'sdot ' + s;
   ind.title = statusText();
   const sec = $('#syncSection'); if (sec) sec.innerHTML = syncSectionHTML();
+  refreshPushSection();
 }
 function statusText(){
   return ({online:'Verbunden – alles wird automatisch abgeglichen', offline:'Offline – Änderungen werden später übertragen',
@@ -1406,8 +1434,83 @@ function checkJoinLink(){
 }
 
 /* =========================================================
+   Morgen-Benachrichtigung (Web Push)
+   Das Gerät meldet sich in der Familien-Datenbank unter push/<Geräte-ID> an.
+   Verschickt wird stündlich von GitHub Actions (push-senden.js).
+   ========================================================= */
+const PUSHKEY = 'wirzwei.push';
+let pushCfg = lsGet(PUSHKEY, {on:false, person:'a', hour:9});
+const pushSupported = () => 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window && location.protocol === 'https:';
+function deviceId(){
+  let id = lsGet('wirzwei.device', null);
+  if (!id){ id = uid() + uid(); lsSet('wirzwei.device', id); }
+  return id;
+}
+const b64uToBytes = s => Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/') + '==='.slice((s.length + 3) % 4)), c => c.charCodeAt(0));
+
+function pushSectionHTML(){
+  const head = '<div class="section"><h3>Morgens benachrichtigen</h3></div>';
+  if (!pushSupported()) return head + '<p class="muted">Benachrichtigungen gehen nur, wenn die App über ihre Webadresse (https) in Chrome läuft bzw. von dort installiert wurde.</p>';
+  if (!sync) return head + '<p class="muted">Bitte zuerst oben „Geräte verbinden“ einrichten – die Nachrichten laufen über eure Familien-Datenbank.</p>';
+  const c = pushCfg, hours = Array.from({length:18}, (_, i) => i + 5);
+  return head + `
+    <p class="muted">Jeden Morgen eine Nachricht auf dieses Gerät, was heute ansteht.</p>
+    <div class="row2">
+      <div class="field" style="margin:0"><span>Aufgaben von</span><div class="opts">${['a','b'].map(k => opt('pushWho', k, esc(P(k).name), c.person === k)).join('')}</div></div>
+      <label class="field" style="margin:0"><span>Uhrzeit</span><select id="pushHour">${hours.map(h => `<option value="${h}" ${c.hour === h ? 'selected' : ''}>${pad(h)}:00 Uhr</option>`).join('')}</select></label>
+    </div>
+    <div class="syncbox" style="margin-top:14px"><span class="sdot ${c.on ? 'online' : ''}"></span>${c.on ? `Aktiv – täglich gegen ${pad(c.hour)}:00 Uhr für ${esc(P(c.person).name)}` : 'Ausgeschaltet'}</div>
+    <div class="actions start">
+      ${c.on ? '<button class="btn" data-action="push-save">Änderung speichern</button><button class="btn" data-action="push-off">Ausschalten</button>'
+             : '<button class="btn primary" data-action="push-on">🔔 Einschalten</button>'}
+      <button class="btn" data-action="push-test">Vorschau anzeigen</button>
+    </div>`;
+}
+function refreshPushSection(){ const s = $('#pushSection'); if (s) s.innerHTML = pushSectionHTML(); }
+const pushForm = () => ({
+  person: document.querySelector('[name=pushWho]:checked')?.value || pushCfg.person,
+  hour: +(document.querySelector('#pushHour')?.value || pushCfg.hour),
+});
+
+async function askPermission(){
+  const perm = await Notification.requestPermission();
+  if (perm !== 'granted'){ toast('Benachrichtigungen sind für die App nicht erlaubt (Android-Einstellungen prüfen)'); return false; }
+  return true;
+}
+async function pushEnable(){
+  const {person, hour} = pushForm();
+  if (!famRef) return toast('Gerade keine Verbindung zur Datenbank – bitte gleich nochmal versuchen');
+  if (!await askPermission()) return;
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    const sub = await reg.pushManager.getSubscription() || await reg.pushManager.subscribe({userVisibleOnly:true, applicationServerKey:b64uToBytes(VAPID_PUBLIC)});
+    await famRef.child('push/' + deviceId()).update({sub: sub.toJSON(), person, hour, updated: Date.now()});
+    pushCfg = {on:true, person, hour}; lsSet(PUSHKEY, pushCfg);
+    refreshPushSection();
+    toast(`Eingeschaltet – täglich gegen ${pad(hour)}:00 Uhr`);
+  } catch(e){ toast('Einschalten fehlgeschlagen: ' + e.message); }
+}
+async function pushDisable(){
+  try { const sub = await (await navigator.serviceWorker.ready).pushManager.getSubscription(); if (sub) await sub.unsubscribe(); } catch(e) {}
+  try { famRef && await famRef.child('push/' + deviceId()).remove(); } catch(e) {}
+  pushCfg.on = false; lsSet(PUSHKEY, pushCfg);
+  refreshPushSection(); toast('Benachrichtigung ausgeschaltet');
+}
+async function pushTest(){
+  if (!await askPermission()) return;
+  const msg = buildDigest(pushForm().person, today());
+  (await navigator.serviceWorker.ready).showNotification(msg.title, {body:msg.body, icon:'icon-192.png', badge:'badge-96.png', tag:'daily', data:{url:'./?view=day'}});
+}
+
+/* =========================================================
    Start
    ========================================================= */
+// Aus der Benachrichtigung geöffnet → direkt die Tagesansicht von heute
+const startView = new URLSearchParams(location.search).get('view');
+if (['day','week','month','tasks','balance'].includes(startView)){
+  ui.view = startView; saveUI();
+  history.replaceState(null, '', location.pathname + location.hash);
+}
 if (!storageOK) showBanner('Dieser Browser erlaubt kein dauerhaftes Speichern (privater Modus?). Änderungen gehen beim Schließen verloren.');
 render();
 setStatus(syncStatus);

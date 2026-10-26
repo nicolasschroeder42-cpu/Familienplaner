@@ -1,7 +1,7 @@
 // Offline-Unterstützung: App-Dateien und Firebase-Bibliothek werden zwischengespeichert,
 // damit der Familienplaner auch ohne Internet startet. Daten gleicht die App selbst ab.
-const CACHE = 'wirzwei-v3';
-const CORE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
+const CACHE = 'wirzwei-v4';
+const CORE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './badge-96.png'];
 
 self.addEventListener('install', e => {
   self.skipWaiting();
@@ -33,4 +33,24 @@ self.addEventListener('fetch', e => {
       const copy = res.clone(); caches.open(CACHE).then(c => c.put(req, copy)); return res;
     })));
   }
+});
+
+// Morgen-Benachrichtigung (verschickt von GitHub Actions, siehe push-senden.js)
+self.addEventListener('push', e => {
+  let d = {};
+  try { d = e.data.json(); } catch(_) { d = {body: e.data ? e.data.text() : ''}; }
+  e.waitUntil(self.registration.showNotification(d.title || 'Familienplaner', {
+    body: d.body || '', icon: 'icon-192.png', badge: 'badge-96.png', tag: 'daily', renotify: true,
+    data: {url: d.url || './?view=day'},
+  }));
+});
+
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  const url = new URL(e.notification.data?.url || './', self.registration.scope).href;
+  e.waitUntil(clients.matchAll({type:'window', includeUncontrolled:true}).then(list => {
+    const win = list.find(w => w.url.startsWith(self.registration.scope));
+    if (win) return win.navigate(url).then(w => (w || win).focus()).catch(() => win.focus());
+    return clients.openWindow(url);
+  }));
 });
