@@ -170,6 +170,10 @@ main{max-width:1240px;margin:0 auto;padding:12px 16px}
 .seg-switch{display:inline-flex;background:var(--card2);border-radius:12px;padding:3px}
 .seg-switch button{padding:6px 14px;border-radius:9px;font-weight:600;font-size:14px;color:var(--muted)}
 .seg-switch button.active{background:var(--card);color:var(--text);box-shadow:var(--shadow)}
+/* Geräte-Besitzer: gewählte Person deutlich in ihrer Farbe hervorheben */
+.seg-switch.owner button{padding:9px 18px;font-size:15px}
+.seg-switch.owner button.active{background:var(--grad);color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.seg-switch.owner button.active::before{content:"✓ "}
 
 /* ---------- FAB ---------- */
 .fab{position:fixed;right:max(20px,env(safe-area-inset-right));bottom:max(24px,env(safe-area-inset-bottom));z-index:30;height:60px;padding:0 24px 0 20px;border-radius:30px;background:linear-gradient(135deg,var(--a),var(--b));color:#fff;font-weight:700;font-size:16px;display:flex;align-items:center;gap:8px;box-shadow:0 10px 30px color-mix(in srgb,var(--a) 40%,transparent)}
@@ -886,15 +890,39 @@ function renderBalance(v){
 /* =========================================================
    Dialoge
    ========================================================= */
+// Zurück-Taste (Android) schließt ein offenes Fenster statt die App:
+// beim Öffnen wird ein Verlaufseintrag angelegt, „Zurück“ entfernt ihn wieder.
+let modalHist = false, backPending = false;
+function pushModalHist(){
+  if (modalHist || backPending || !state.setupDone) return;
+  history.pushState({modal: 1}, '');
+  modalHist = true;
+}
 function openModal(html, onMount){
   $('#sheet').innerHTML = html;
   $('#modal').hidden = false;
+  pushModalHist();
   onMount && onMount($('#sheet'));
+}
+function hideModal(){
+  $('#modal').hidden = true; $('#sheet').innerHTML = '';
+  if (modalHist){ modalHist = false; backPending = true; history.back(); }
 }
 function closeModal(){
   if (!state.setupDone) return;
-  $('#modal').hidden = true; $('#sheet').innerHTML = '';
+  hideModal();
 }
+window.addEventListener('popstate', () => {
+  if (backPending){
+    backPending = false;
+    if (!$('#modal').hidden) pushModalHist();   // inzwischen wurde schon das nächste Fenster geöffnet
+    return;
+  }
+  if (!modalHist) return;
+  modalHist = false;
+  if (!state.setupDone){ pushModalHist(); return; }   // Ersteinrichtung lässt sich nicht wegklicken
+  $('#modal').hidden = true; $('#sheet').innerHTML = '';
+});
 
 function opt(name, value, label, checked, cls = '', type = 'radio'){
   return `<label class="opt ${cls}"><input type="${type}" name="${name}" value="${esc(value)}" ${checked ? 'checked' : ''}><span>${label}</span></label>`;
@@ -1258,7 +1286,8 @@ function openThought(){
       <div class="actions stack"><button type="submit" class="btn primary">Festhalten</button></div>
     </form>`, sheet => {
       const f = sheet.querySelector('form');
-      setTimeout(() => f.text.focus(), 50);   // hier gewollt: man tippt 💭 ja, um sofort zu schreiben
+      // Nur mit Maus/PC direkt ins Feld springen – auf Touch-Geräten würde sonst sofort die Tastatur aufgehen
+      if (matchMedia('(pointer: fine)').matches) setTimeout(() => f.text.focus(), 50);
       f.addEventListener('submit', e => {
         e.preventDefault();
         const v = f.text.value.trim();
@@ -1550,16 +1579,16 @@ function openSettings(first){
     </div>
     <p class="muted" style="margin-top:8px">Gilt nur für dieses Gerät. „Automatisch“ folgt der Einstellung von Android.</p>
     <div class="section"><h3>Dieses Gerät gehört</h3></div>
-    <div class="seg-switch">
-      ${[['a', P('a').name], ['b', P('b').name], ['', 'Gemeinsam']].map(([k, l]) => `<button class="${(ui.me || '') === k ? 'active' : ''}" data-action="me" data-k="${k}">${esc(l)}</button>`).join('')}
+    <div class="seg-switch owner">
+      ${[['a', P('a').name], ['b', P('b').name], ['', 'Gemeinsam']].map(([k, l]) => `<button class="${(ui.me || '') === k ? 'active' : ''} who-${k || 'both'}" data-action="me" data-k="${k}">${esc(l)}</button>`).join('')}
     </div>
     <p class="muted" style="margin-top:8px">Wird z. B. im Eingang als Absender angezeigt. Für das gemeinsame Tablet „Gemeinsam“ wählen.</p>
+    <div id="pushSection">${pushSectionHTML()}</div>
+    <div id="reqSection">${reqSectionHTML()}</div>
+    <div id="syncSection">${syncSectionHTML()}</div>
     <div class="section"><h3>📺 Kühlschrank-Modus</h3></div>
     <p class="muted">Großansicht für ein fest aufgestelltes Tablet (quer): beide Personen nebeneinander, große Schrift, der Bildschirm bleibt an und springt um Mitternacht auf den neuen Tag. Gilt nur für dieses Gerät – die Handys bleiben unverändert. Beenden über „✕ Beenden“ oben rechts.</p>
     <div class="actions start"><button class="btn primary" data-action="kiosk-on">📺 Kühlschrank-Modus starten</button></div>
-    <div id="syncSection">${syncSectionHTML()}</div>
-    <div id="pushSection">${pushSectionHTML()}</div>
-    <div id="reqSection">${reqSectionHTML()}</div>
     <div class="section"><h3>Datensicherung</h3></div>
     <p style="color:var(--muted);font-size:14px;margin:0 0 10px">Alles wird automatisch auf diesem Gerät im Browser gespeichert. Erstellt zur Sicherheit ab und zu ein Backup – damit könnt ihr die Daten auch auf ein anderes Gerät übertragen.</p>
     <div class="actions" style="justify-content:flex-start;margin-top:0">
@@ -1708,7 +1737,7 @@ document.addEventListener('click', e => {
     case 'import':   $('#importFile').click(); break;
     case 'reset':
       if (confirm(`Wirklich ALLE Aufgaben und Erledigt-Häkchen löschen?${sync ? '\nAchtung: Das gilt für ALLE verbundenen Geräte!' : ''}`) && confirm('Sicher? Das kann nicht rückgängig gemacht werden.')){
-        state = defaultState(); save(); $('#modal').hidden = true; render(); openSettings(true);
+        state = defaultState(); save(); hideModal(); render(); openSettings(true);
       }
       break;
   }
@@ -1987,7 +2016,7 @@ function openSyncJoin(){
 function joinFamily(d){
   connect(d.c, d.f, false);
   state.setupDone = true; saveLocal();
-  $('#modal').hidden = true; render();
+  hideModal(); render();
   toast('Verbunden – Daten werden geladen …');
 }
 function openSyncShare(){
@@ -2039,7 +2068,7 @@ function deviceId(){
 const b64uToBytes = s => Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/') + '==='.slice((s.length + 3) % 4)), c => c.charCodeAt(0));
 
 function pushSectionHTML(){
-  const head = '<div class="section"><h3>Morgens benachrichtigen</h3></div>';
+  const head = '<div class="section"><h3>Benachrichtigungen</h3></div>';
   if (!pushSupported()) return head + '<p class="muted">Benachrichtigungen gehen nur, wenn die App über ihre Webadresse (https) in Chrome läuft bzw. von dort installiert wurde.</p>';
   if (!sync) return head + '<p class="muted">Bitte zuerst oben „Geräte verbinden“ einrichten – die Nachrichten laufen über eure Familien-Datenbank.</p>';
   // Benachrichtigungen sind persönlich: sie gelten immer für die Person, der dieses Gerät gehört
