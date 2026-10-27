@@ -1,0 +1,26 @@
+name: Tausch-Anfrage
+
+# Wird von der App angestoßen, sobald eine Tausch-Anfrage gestellt oder beantwortet wurde.
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: tausch-anfrage
+  cancel-in-progress: false
+
+jobs:
+  senden:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install --no-save --no-audit --no-fund web-push@3.6.7
+      - run: node push-senden.js
+        env:
+          TZ: Europe/Berlin
+          MODE: requests
+          FAMILY_CODE: ${{ secrets.FAMILY_CODE }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
