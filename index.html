@@ -223,9 +223,70 @@ main{max-width:1240px;margin:0 auto;padding:12px 16px}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .banner{max-width:1240px;margin:12px auto 0;padding:10px 16px;background:#fef3c7;color:#92400e;border-radius:12px;font-size:14px}
 
-@media (max-width:820px){
-  .tabs button span{display:none}
+/* ---------- Pausen, Eingang, Logbuch, Anfragen ---------- */
+.pause-banner{display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:16px;background:color-mix(in srgb,#0ea5e9 14%,var(--card));margin-top:12px;font-weight:600}
+.pause-banner small{display:block;font-weight:500;color:var(--muted)}
+.prow{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:14px;background:var(--card);box-shadow:var(--shadow);cursor:pointer}
+.prow .main{flex:1;min-width:0}
+.prow .main small{display:block;color:var(--muted);font-size:13px}
+.prow .ic{font-size:22px}
+.req{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:14px 16px;border-radius:16px;background:color-mix(in srgb,#f59e0b 16%,var(--card));margin-top:12px}
+.req .txt{flex:1;min-width:200px;font-weight:600}
+.req .txt small{display:block;font-weight:500;color:var(--muted)}
+.req .btn{padding:9px 16px}
+.inbox-add{display:flex;gap:8px}
+.inbox-add input{flex:1;min-width:0;padding:14px 16px;border-radius:14px;border:1.5px solid var(--line);background:var(--card);font-size:16px;outline:none}
+.inbox-add input:focus{border-color:var(--a)}
+.note{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-radius:14px;background:var(--card);box-shadow:var(--shadow);flex-wrap:wrap}
+.note .main{flex:1;min-width:180px;white-space:pre-wrap;overflow-wrap:anywhere}
+.note .main small{display:block;color:var(--muted);font-size:12.5px;margin-top:4px;white-space:normal}
+.note .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.mini{padding:7px 12px;border-radius:10px;font-weight:700;font-size:13.5px;background:var(--card2)}
+.mini.primary{background:var(--text);color:var(--bg)}
+.tabs button{position:relative}
+.tab-badge{position:absolute;top:1px;right:3px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:#ef4444;color:#fff;font-size:10.5px;font-weight:800;display:grid;place-items:center}
+.log{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:16px;background:var(--card);box-shadow:var(--shadow);cursor:pointer;border-left:5px solid var(--st)}
+.log .ic{font-size:26px}
+.log .main{flex:1;min-width:0}
+.log .main b{font-size:16px}
+.log .main small{display:block;color:var(--muted);font-size:13px}
+.st-pill{font-size:12.5px;font-weight:700;padding:4px 10px;border-radius:999px;background:color-mix(in srgb,var(--st) 16%,var(--card));color:var(--st);white-space:nowrap}
+.st-over{--st:#dc2626}.st-soon{--st:#d97706}.st-ok{--st:#10b981}.st-none{--st:#9ca3af}
+.fab2{position:fixed;right:max(26px,calc(env(safe-area-inset-right) + 6px));bottom:max(96px,calc(env(safe-area-inset-bottom) + 72px));z-index:30;width:48px;height:48px;border-radius:50%;background:var(--card);box-shadow:var(--shadow),0 4px 14px rgba(0,0,0,.14);font-size:22px;display:grid;place-items:center}
+
+/* ---------- Kühlschrank-Modus (pro Gerät) ---------- */
+body.kiosk{padding-bottom:20px}
+body.kiosk .top,body.kiosk #toolbar,body.kiosk .fab,body.kiosk .fab2{display:none}
+body.kiosk main{max-width:none;padding:18px 24px}
+.k-head{display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+.k-time{font-size:64px;font-weight:800;letter-spacing:-2px;line-height:1;font-variant-numeric:tabular-nums}
+.k-date{font-size:22px;color:var(--muted);font-weight:600}
+.k-info{flex:1;display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;align-items:center}
+.k-pill{padding:10px 18px;border-radius:999px;background:var(--card);box-shadow:var(--shadow);font-weight:700;font-size:16px}
+.k-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:18px}
+.k-col{background:var(--card);border-radius:22px;box-shadow:var(--shadow);padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.k-col-head{display:flex;align-items:center;gap:12px}
+.k-col-head .avatar{width:46px;height:46px;font-size:19px}
+.k-col-head b{font-size:23px}
+.k-col-head small{display:block;color:var(--muted);font-size:15px}
+.k-bar{height:8px;border-radius:4px;background:var(--card2);overflow:hidden}
+.k-bar i{display:block;height:100%;background:var(--grad);transition:width .4s}
+.k-foot{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;margin-top:18px}
+.k-empty{color:var(--muted);text-align:center;padding:26px 8px;font-size:18px}
+body.kiosk .item{padding:14px 16px 14px 20px}
+body.kiosk .item-title{font-size:20px}
+body.kiosk .item-desc{font-size:15px}
+body.kiosk .item-meta{font-size:14px}
+body.kiosk .item .check{width:46px;height:46px}
+body.kiosk .item .check svg{width:24px;height:24px}
+body.kiosk .k-cols .avatar:not(.k-col-head .avatar){display:none}
+@media (max-width:900px){.k-cols{grid-template-columns:1fr}.k-time{font-size:44px}}
+
+@media (max-width:1180px){
+  .tabs button span:not(.tab-badge){display:none}
   .tabs button{padding:9px 12px}
+}
+@media (max-width:820px){
   .hero{grid-template-columns:1fr}
 }
 @media (max-width:640px){
@@ -259,6 +320,8 @@ main{max-width:1240px;margin:0 auto;padding:12px 16px}
       <button data-view="week"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9 4v16M15 4v16"/></svg><span>Woche</span></button>
       <button data-view="month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M3 9h18M8 2v4M16 2v4M8 13h.01M12 13h.01M16 13h.01M8 17h.01M12 17h.01"/></svg><span>Monat</span></button>
       <button data-view="tasks"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6h12M9 12h12M9 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg><span>Aufgaben</span></button>
+      <button data-view="inbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5.1L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.5-6.9A2 2 0 0 0 16.8 4H7.2a2 2 0 0 0-1.7 1.1z"/></svg><span>Eingang</span><span class="tab-badge" id="inboxBadge" hidden></span></button>
+      <button data-view="log"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1"/><path d="M12 17s-3.5-2.1-3.5-4.3A1.8 1.8 0 0 1 12 11.6a1.8 1.8 0 0 1 3.5 1.1C15.5 14.9 12 17 12 17z"/></svg><span>Logbuch</span></button>
       <button data-view="balance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M7 21h10M5 7h14M5 7l-3 7a4 4 0 0 0 6 0zM19 7l-3 7a4 4 0 0 0 6 0z"/></svg><span>Balance</span></button>
     </nav>
     <span class="icon-btn sync-ind" id="syncInd" role="img" title="Synchronisierung" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H7a5 5 0 1 1 1.1-9.9A6 6 0 0 1 19.6 11 4 4 0 0 1 17.5 19z"/></svg><span class="sdot"></span></span>
@@ -270,6 +333,7 @@ main{max-width:1240px;margin:0 auto;padding:12px 16px}
 <div class="toolbar" id="toolbar"></div>
 <main id="view"></main>
 
+<button class="fab2" data-action="thought" title="Gedanke festhalten" aria-label="Gedanke festhalten">💭</button>
 <button class="fab" data-action="new"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg><span>Neue Aufgabe</span></button>
 <div id="modal" class="modal" hidden><div class="sheet" id="sheet"></div></div>
 <div id="toast" class="toast"></div>
@@ -298,6 +362,7 @@ const CATS = [
   {id:'termine',    name:'Termine',         icon:'📅'},
   {id:'finanzen',   name:'Finanzen',        icon:'💶'},
   {id:'gesundheit', name:'Gesundheit',      icon:'🩺'},
+  {id:'garten',     name:'Garten',          icon:'🌱'},
   {id:'sonstiges',  name:'Sonstiges',       icon:'✨'},
 ];
 const FREQS = [
@@ -350,6 +415,11 @@ function defaultState(){
     tasks: [],        // Aufgaben (Versionen; gleiche sid = gleiche Serie)
     done: {},         // key -> {at}
     overrides: {},    // key -> 'a' | 'b' | 'both'  (Zuständigkeit für einen einzelnen Termin)
+    moves: {},        // key -> 'YYYY-MM-DD'      (einzelner Termin auf einen anderen Tag verschoben)
+    pauses: {},       // id -> {label, from, to, scope:'all'|'some', sids:[]}   (Urlaub / Pause)
+    inbox: {},        // id -> {text, by, at}                                    (Kopf leeren)
+    requests: {},     // id -> {key, sid, orig, date, title, from, to, status, at, …} (Tausch-Anfragen)
+    health: {},       // id -> {subject, title, last, every, unit, next, notes, history:[]} (Logbuch)
   };
 }
 function load(){
@@ -357,7 +427,7 @@ function load(){
   return defaultState();
 }
 let state = load();
-let ui = Object.assign({view:'day', filter:'all', balRange:'week', theme:'auto'}, (() => { try { return JSON.parse(localStorage.getItem(UIKEY)) || {}; } catch(e) { return {}; } })());
+let ui = Object.assign({view:'day', filter:'all', balRange:'week', theme:'auto', me:'', kiosk:false}, (() => { try { return JSON.parse(localStorage.getItem(UIKEY)) || {}; } catch(e) { return {}; } })());
 ui.cursor = today();
 
 function saveLocal(){
@@ -366,7 +436,7 @@ function saveLocal(){
   catch(e) { showBanner('Speichern fehlgeschlagen. Bitte unter Einstellungen ein Backup exportieren.'); }
 }
 function save(){ saveLocal(); pushSync(); }
-function saveUI(){ try { localStorage.setItem(UIKEY, JSON.stringify({view:ui.view, filter:ui.filter, balRange:ui.balRange, theme:ui.theme})); } catch(e) {} }
+function saveUI(){ try { localStorage.setItem(UIKEY, JSON.stringify({view:ui.view, filter:ui.filter, balRange:ui.balRange, theme:ui.theme, me:ui.me, kiosk:ui.kiosk})); } catch(e) {} }
 
 // Darstellung (pro Gerät): auto | light | dark
 const darkQuery = matchMedia('(prefers-color-scheme: dark)');
@@ -426,9 +496,31 @@ function makeInst(t, key, d){
   return { task:t, key, date:d, who, overridden, done: !!state.done[key] };
 }
 
+// Urlaub / Pause: betrifft nur wiederkehrende Aufgaben – einmalige und jährliche Termine bleiben bestehen
+const PAUSABLE = ['daily','weekdays','weekly','monthly','weekflex','monthflex'];
+const activePauses = d => Object.values(state.pauses || {}).filter(p => p && p.from <= d && d <= p.to);
+function pauseFor(t, d){
+  if (!PAUSABLE.includes(t.freq.type)) return null;
+  return activePauses(d).find(p => p.scope !== 'some' || (p.sids || []).includes(t.sid)) || null;
+}
+function pausedDays(t, from, n){
+  let c = 0;
+  for (let k = 0; k < n; k++) if (pauseFor(t, addDays(from, k))) c++;
+  return c;
+}
+
 function dayInsts(d){
-  return state.tasks.filter(t => DAY_TYPES.includes(t.freq.type) && occursOn(t, d))
-    .map(t => makeInst(t, `${t.sid}|${d}`, d));
+  const moves = state.moves || {};
+  const own = state.tasks.filter(t => DAY_TYPES.includes(t.freq.type) && occursOn(t, d) && !pauseFor(t, d))
+    .map(t => makeInst(t, `${t.sid}|${d}`, d))
+    .filter(i => !moves[i.key]);
+  // Termine, die von einem anderen Tag hierher verschoben wurden (Schlüssel bleibt der ursprüngliche)
+  const movedIn = Object.keys(moves).filter(k => moves[k] === d).map(k => {
+    const [sid, from] = k.split('|');
+    const t = state.tasks.find(x => x.sid === sid && DAY_TYPES.includes(x.freq.type) && occursOn(x, from));
+    return t && Object.assign(makeInst(t, k, from), {date: d, movedFrom: from});
+  }).filter(Boolean);
+  return own.concat(movedIn);
 }
 // Wird eine Serie mitten in der Woche/im Monat geändert, gilt für diesen Zeitraum die neuere Version
 function latestPerSeries(list){
@@ -440,12 +532,15 @@ function weekFlexInsts(mon){
   const sun = addDays(mon, 6);
   return latestPerSeries(state.tasks.filter(t => t.freq.type === 'weekflex' && active(t, mon, sun)
       && mod(daysBetween(monday(t.origin), mon)/7, t.freq.every || 1) === 0))
+    .filter(t => pausedDays(t, mon, 7) < 4)   // pausiert, wenn die Pause den Großteil der Woche abdeckt
     .map(t => makeInst(t, `${t.sid}|W${mon}`, mon));
 }
 function monthFlexInsts(anyDay){
   const D = parse(anyDay), first = iso(new Date(D.getFullYear(), D.getMonth(), 1)), last = iso(new Date(D.getFullYear(), D.getMonth()+1, 0));
+  const nDays = daysInMonth(D.getFullYear(), D.getMonth());
   return latestPerSeries(state.tasks.filter(t => t.freq.type === 'monthflex' && active(t, first, last)
       && mod(monthsBetween(t.origin, first), t.freq.every || 1) === 0))
+    .filter(t => pausedDays(t, first, nDays) * 2 < nDays)   // pausiert, wenn die Pause den Großteil des Monats abdeckt
     .map(t => makeInst(t, `${t.sid}|M${first.slice(0,7)}`, first));
 }
 function overdueInsts(){
@@ -473,7 +568,9 @@ function freqText(t){
 }
 
 // Text der Morgen-Benachrichtigung für Person p ('a' | 'b') am Tag d
+// null = heute keine Nachricht (Pause für alle Aufgaben)
 function buildDigest(p, d){
+  if (activePauses(d).some(x => x.scope !== 'some')) return null;
   const mine = i => (i.who === p || i.who === 'both') && !i.done;
   const day = sortInsts(dayInsts(d).filter(mine));
   const over = overdueInsts().filter(mine);
@@ -483,6 +580,8 @@ function buildDigest(p, d){
   const parts = [day.length ? `Heute ${day.length === 1 ? '1 Aufgabe' : day.length + ' Aufgaben'}: ${list(day)}` : 'Heute steht nichts Festes für dich an. 🌿'];
   if (over.length) parts.push(`⚠️ Überfällig: ${list(over)}`);
   if (week.length) parts.push(`Diese Woche noch offen: ${list(week)}`);
+  const due = Object.values(state.health || {}).filter(h => h && h.next && h.next <= d);
+  if (due.length) parts.push(`🩺 Fällig: ${due.slice(0, 3).map(h => `${h.title} (${h.subject})`).join(', ')}${due.length > 3 ? ' …' : ''}`);
   return {title: `Guten Morgen${name ? ', ' + name : ''}! ☀️`, body: parts.join('\n')};
 }
 /* @core-end */
@@ -498,14 +597,20 @@ function applyColors(){
   document.documentElement.style.setProperty('--b', P('b').color);
 }
 
+const VIEWS = {day:renderDay, week:renderWeek, month:renderMonth, tasks:renderTasks, inbox:renderInbox, log:renderLog, balance:renderBalance};
 function render(){
   applyColors();
   instIndex = new Map();
+  if (!VIEWS[ui.view]) ui.view = 'day';
+  document.body.classList.toggle('kiosk', !!ui.kiosk);
   document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('active', b.dataset.view === ui.view));
   $('#subtitle').textContent = `${P('a').name} & ${P('b').name}`;
-  renderToolbar();
+  const n = Object.keys(state.inbox || {}).length, badge = $('#inboxBadge');
+  badge.hidden = !n; badge.textContent = n;
   const v = $('#view');
-  ({day:renderDay, week:renderWeek, month:renderMonth, tasks:renderTasks, balance:renderBalance})[ui.view](v);
+  if (ui.kiosk){ $('#toolbar').innerHTML = ''; return renderKiosk(v); }
+  renderToolbar();
+  VIEWS[ui.view](v);
 }
 
 function filterHTML(){
@@ -532,8 +637,8 @@ function renderToolbar(){
       <button class="round" data-action="next" aria-label="vor">${ICON_R}</button>
       <span class="lbl">${esc(label)}</span>
       ${isNow ? '' : '<button class="pill-btn" data-action="now">Heute</button>'}
-    </div>` : `<div class="datenav"><span class="lbl">Alle Aufgaben</span></div>`;
-  $('#toolbar').innerHTML = nav + (ui.view === 'balance' ? '' : filterHTML());
+    </div>` : `<div class="datenav"><span class="lbl">${({tasks:'Alle Aufgaben', inbox:'💭 Eingang', log:'🩺 Logbuch'})[ui.view]}</span></div>`;
+  $('#toolbar').innerHTML = nav + (['balance','inbox','log'].includes(ui.view) ? '' : filterHTML());
 }
 
 function itemHTML(i, opts = {}){
@@ -542,13 +647,15 @@ function itemHTML(i, opts = {}){
   if (opts.chip){
     return `<div class="chip who-${i.who} ${i.done ? 'done' : ''}" data-key="${esc(i.key)}">
       <button class="check" data-action="toggle" aria-label="erledigt">${ICON_CHECK}</button>
-      <div class="item-body" data-action="open">${c.icon} ${esc(t.title)}</div></div>`;
+      <div class="item-body" data-action="open">${i.movedFrom ? '↷ ' : ''}${t.kind === 'think' ? '🧠 ' : ''}${c.icon} ${esc(t.title)}</div></div>`;
   }
   const meta = [`${c.icon} ${c.name}`];
+  if (t.kind === 'think') meta.push('🧠 Denkarbeit');
   if (t.mins) meta.push(`⏱ ${t.mins} min`);
   if (opts.showDate) meta.push(`📆 ${fmtShort(i.date)}`);
   meta.push(`↻ ${freqText(t)}`);
   if (i.overridden) meta.push('⇄ getauscht');
+  if (i.movedFrom) meta.push(`↷ verschoben von ${fmt(i.movedFrom, {weekday:'short', day:'numeric', month:'numeric'})}`);
   return `<div class="item who-${i.who} ${i.done ? 'done' : ''}" data-key="${esc(i.key)}">
     <button class="check" data-action="toggle" aria-label="erledigt">${ICON_CHECK}</button>
     <div class="item-body" data-action="open">
@@ -587,11 +694,14 @@ function renderDay(v){
   const greeting = d !== td ? fmtLong(d) : (h => h < 11 ? 'Guten Morgen ☀️' : h < 17 ? 'Hallo zusammen 👋' : 'Guten Abend 🌙')(new Date().getHours());
   const sub = !list.length ? 'Nichts geplant – genießt den Tag.' : open ? `${open} ${open === 1 ? 'Aufgabe ist' : 'Aufgaben sind'} noch offen.` : 'Alles erledigt – stark! 🎉';
 
+  const dueLogs = d === td ? healthDue(14) : [];
+
   v.innerHTML = `
     <div class="card hero">
       <div><h2>${esc(greeting)}</h2><p>${d === td ? esc(fmtLong(d)) + ' · ' : ''}${sub}</p></div>
       <div class="rings">${ringHTML('a', all)}${ringHTML('b', all)}</div>
     </div>
+    ${pauseBannerHTML(d)}${d === td ? requestsHTML() : ''}
     <div class="cols2">
       <div>
         ${overdue.filter(matchesFilter).length ? `<div class="section warn"><h3>Überfällig</h3></div>${listHTML(overdue.filter(matchesFilter), '', {showDate:true})}` : ''}
@@ -599,6 +709,8 @@ function renderDay(v){
         ${listHTML(list, '<span class="big">🌿</span>Für diesen Tag steht nichts an.')}
       </div>
       <div>
+        ${dueLogs.length ? `<div class="section"><h3>🩺 Logbuch · bald fällig</h3><span class="count">${dueLogs.length}</span></div>
+          <div class="list">${dueLogs.map(([id, h]) => logRowHTML(id, h)).join('')}</div>` : ''}
         <div class="section"><h3>Diese Woche · flexibel</h3><span class="count">${weekFlex.filter(matchesFilter).length}</span></div>
         ${listHTML(weekFlex.filter(matchesFilter), 'Keine flexiblen Wochenaufgaben.')}
         <div class="section"><h3>Diesen Monat · flexibel</h3><span class="count">${monthFlex.filter(matchesFilter).length}</span></div>
@@ -675,7 +787,7 @@ function renderTasks(v){
       <div class="ic">${c.icon}</div>
       <div class="main"><div class="item-title">${esc(t.title)}</div>
         ${t.desc ? `<div class="item-desc">${esc(t.desc)}</div>` : ''}
-        <div class="item-meta"><span>↻ ${esc(freqText(t))}</span>${t.mins ? `<span>⏱ ${t.mins} min</span>` : ''}</div></div>
+        <div class="item-meta"><span>↻ ${esc(freqText(t))}</span>${t.mins ? `<span>⏱ ${t.mins} min</span>` : ''}${t.kind === 'think' ? '<span>🧠 Denkarbeit</span>' : ''}</div></div>
       ${future}<span class="badge"><span class="dot ${cls}"></span>${esc(whoName(t.assignee))}</span>
     </div>`;
   };
@@ -685,6 +797,7 @@ function renderTasks(v){
       <div class="card"><span class="dot b" style="width:14px;height:14px"></span><div><div class="num">${count('b')}</div><small>${esc(P('b').name)}</small></div></div>
       <div class="card"><span class="dot both" style="width:14px;height:14px"></span><div><div class="num">${count('both') + count('alt')}</div><small>Gemeinsam / abwechselnd</small></div></div>
     </div>
+    ${pausesHTML()}
     ${tasks.length ? groups.map(([name, types]) => {
       const g = tasks.filter(t => types.includes(t.freq.type)).sort((x,y) => x.title.localeCompare(y.title, 'de'));
       return g.length ? `<div class="section"><h3>${name}</h3><span class="count">${g.length}</span></div><div class="list">${g.map(row).join('')}</div>` : '';
@@ -709,30 +822,39 @@ function rangeInsts(){
 }
 function renderBalance(v){
   const insts = rangeInsts();
-  const s = {a:{n:0,m:0,dn:0,dm:0}, b:{n:0,m:0,dn:0,dm:0}};
+  const s = {a:{n:0,m:0,dn:0,dm:0,tn:0,hm:0}, b:{n:0,m:0,dn:0,dm:0,tn:0,hm:0}};
   const byCat = {};
   insts.forEach(i => {
-    const m = i.task.mins || 0;
+    const m = i.task.mins || 0, think = i.task.kind === 'think';
     const ws = i.who === 'both' ? ['a','b'] : [i.who];
     ws.forEach(w => {
       s[w].n++; s[w].m += m;
+      if (think) s[w].tn++; else s[w].hm += m;
       if (i.done){ s[w].dn++; s[w].dm += m; }
       byCat[i.task.cat] = byCat[i.task.cat] || {a:0, b:0};
       byCat[i.task.cat][w] += m;
     });
   });
-  const tot = s.a.m + s.b.m;
-  const pa = tot ? Math.round(s.a.m / tot * 100) : 50, pb = 100 - pa;
-  let verdict = 'Noch keine Aufgaben mit Zeitangabe in diesem Zeitraum.';
-  if (tot){
-    if (Math.abs(pa - 50) <= 7) verdict = '⚖️ Ziemlich ausgeglichen – schön!';
-    else verdict = `${pa > 50 ? esc(P('a').name) : esc(P('b').name)} trägt gerade mehr (${Math.max(pa,pb)} % der geplanten Zeit). Vielleicht etwas umverteilen?`;
-  }
+  // Eine Verteilungs-Karte: Balken A | B plus Einschätzung
+  const splitCard = (title, sub, va, vb, show, empty) => {
+    const tot = va + vb, pa = tot ? Math.round(va / tot * 100) : 50, pb = 100 - pa;
+    const verdict = !tot ? empty : Math.abs(pa - 50) <= 7 ? '⚖️ Ziemlich ausgeglichen – schön!'
+      : `${esc(P(pa > 50 ? 'a' : 'b').name)} trägt hier gerade mehr (${Math.max(pa, pb)} %). Vielleicht etwas umverteilen?`;
+    return `<div class="card" style="margin-bottom:12px">
+      <div class="section" style="margin:0"><h3>${title}</h3></div>
+      <p class="muted" style="margin:6px 0 0">${sub}</p>
+      <div class="bal-split">
+        <div class="bal-a" style="width:${pa}%">${tot && pa >= 14 ? `${esc(P('a').name)} · ${show(va)}` : ''}</div>
+        <div class="bal-b" style="width:${pb}%">${tot && pb >= 14 ? `${show(vb)} · ${esc(P('b').name)}` : ''}</div>
+      </div>
+      <div class="verdict">${verdict}</div></div>`;
+  };
   const statCard = k => `<div class="card stat who-${k}">
     <div style="display:flex;align-items:center;gap:10px"><div class="avatar">${esc(initials(k))}</div><b style="font-size:17px">${esc(P(k).name)}</b></div>
     <div class="row"><span>Aufgaben geplant</span><b>${s[k].n}</b></div>
     <div class="row"><span>davon erledigt</span><b>${s[k].dn}</b></div>
-    <div class="row"><span>Zeit geplant</span><b>${fmtMins(s[k].m)}</b></div>
+    <div class="row"><span>🧠 Denkarbeit</span><b>${s[k].tn} ${s[k].tn === 1 ? 'Sache' : 'Sachen'}</b></div>
+    <div class="row"><span>🛠️ Erledigen</span><b>${fmtMins(s[k].hm)}</b></div>
     <div class="row"><span>Zeit erledigt</span><b>${fmtMins(s[k].dm)}</b></div></div>`;
   const cats = CATS.filter(c => byCat[c.id] && (byCat[c.id].a + byCat[c.id].b) > 0);
   v.innerHTML = `
@@ -740,15 +862,11 @@ function renderBalance(v){
       <button class="${ui.balRange === 'week' ? 'active' : ''}" data-action="balrange" data-r="week">Woche</button>
       <button class="${ui.balRange === 'month' ? 'active' : ''}" data-action="balrange" data-r="month">Monat</button>
     </div>
-    <div class="card">
-      <div class="section" style="margin:0"><h3>Verteilung der geplanten Zeit</h3></div>
-      <div class="bal-split">
-        <div class="bal-a" style="width:${pa}%">${pa >= 12 ? `${esc(P('a').name)} ${pa} %` : ''}</div>
-        <div class="bal-b" style="width:${pb}%">${pb >= 12 ? `${pb} % ${esc(P('b').name)}` : ''}</div>
-      </div>
-      <div class="verdict">${verdict}</div>
-      <div class="hint">„Beide“-Aufgaben zählen für beide voll. Abwechselnde Aufgaben zählen für die Person, die gerade dran ist. Die Zeit stammt aus der „Dauer“ jeder Aufgabe.</div>
-    </div>
+    ${splitCard('🧠 Denkarbeit – im Kopf tragen', 'Wie viele Dinge jede Person im Blick behalten, planen und organisieren muss (Anzahl).',
+      s.a.tn, s.b.tn, n => n, 'Noch keine Aufgaben als „Dran denken & planen“ markiert – das geht beim Bearbeiten einer Aufgabe unter „Art der Aufgabe“.')}
+    ${splitCard('🛠️ Erledigen – mit den Händen', 'Geplante Zeit für alles, was getan werden muss.',
+      s.a.hm, s.b.hm, fmtMins, 'Noch keine Aufgaben mit Zeitangabe in diesem Zeitraum.')}
+    <div class="hint">„Beide“-Aufgaben zählen für beide voll. Abwechselnde Aufgaben zählen für die Person, die gerade dran ist. Pausierte Aufgaben zählen nicht.</div>
     <div class="stat-grid">${statCard('a')}${statCard('b')}</div>
     <div class="section"><h3>Nach Bereichen</h3></div>
     <div class="card">
@@ -779,11 +897,13 @@ function opt(name, value, label, checked, cls = '', type = 'radio'){
 }
 
 /* ---------- Aufgabe anlegen / bearbeiten ---------- */
-function openTaskForm(task){
+let pendingInboxId = null;   // Aufgabe wird aus einem Eingang-Eintrag erstellt → Eintrag danach entfernen
+function openTaskForm(task, prefill){
   const td = today();
   const isEdit = !!task;
+  pendingInboxId = prefill?.inboxId || null;
   const t = task ? JSON.parse(JSON.stringify(task)) : {
-    title:'', desc:'', cat:'haushalt', mins:15, assignee: ui.filter === 'b' ? 'b' : 'a',
+    title: prefill?.title || '', desc:'', cat:'haushalt', mins:15, kind:'do', assignee: ui.filter === 'b' ? 'b' : 'a',
     freq:{type:'weekly', every:1, days:[dow(td)], dom:parse(td).getDate(), date:td}, start:td
   };
   t.freq = Object.assign({every:1, days:[dow(td)], dom:parse(td).getDate(), date:td}, t.freq);
@@ -799,6 +919,9 @@ function openTaskForm(task){
       <div class="field"><span>Wer ist zuständig?</span><div class="opts">
         ${whoOpt('a', P('a').name)}${whoOpt('b', P('b').name)}${whoOpt('both','Beide')}${whoOpt('alt','Abwechselnd')}
       </div></div>
+      <div class="field"><span>Art der Aufgabe</span><div class="opts">
+        ${opt('kind', 'do', '🛠️ Erledigen', t.kind !== 'think')}${opt('kind', 'think', '🧠 Dran denken &amp; planen', t.kind === 'think')}
+      </div><small>„Dran denken &amp; planen“ ist Kopfarbeit: Termine im Blick behalten, Geschenke überlegen, Infos sichten, organisieren. Die Balance zählt sie getrennt.</small></div>
       <div class="field" data-show="alt"><span>Wer beginnt?</span><div class="opts">
         ${opt('altStart','a',esc(P('a').name),(t.altStart||'a') === 'a')}${opt('altStart','b',esc(P('b').name),t.altStart === 'b')}
       </div><small>Wechselt je Tag, Woche bzw. Monat – je nach Häufigkeit.</small></div>
@@ -869,12 +992,15 @@ function submitTask(form, existing){
     mins: Math.max(0, parseInt(val('mins')) || 0),
     assignee: form.querySelector('[name=who]:checked').value,
     altStart: form.querySelector('[name=altStart]:checked')?.value || 'a',
+    kind: form.querySelector('[name=kind]:checked')?.value === 'think' ? 'think' : 'do',
     freq,
   };
 
   if (!existing){
     const id = uid();
     state.tasks.push({id, sid:id, origin:start, start, end:null, created:Date.now(), ...data});
+    if (pendingInboxId && state.inbox?.[pendingInboxId]) delete state.inbox[pendingInboxId];
+    pendingInboxId = null;
     toast('Aufgabe angelegt');
   } else if (existing.start >= td || !Object.keys(state.done).some(k => k.startsWith(existing.sid + '|'))){
     // Noch nicht begonnen bzw. noch nie abgehakt: direkt anpassen (keine Historie zu bewahren)
@@ -907,8 +1033,16 @@ function deleteTask(task){
 /* ---------- Einzelnen Termin ansehen ---------- */
 function openInstance(i){
   const t = i.task, c = cat(t.cat);
+  const isDayInst = !i.key.includes('|W') && !i.key.includes('|M');
+  const origDate = i.movedFrom || i.date;
   const when = i.key.includes('|W') ? `Woche ${isoWeek(i.date)} (flexibel)` : i.key.includes('|M') ? `${fmt(i.date, {month:'long', year:'numeric'})} (flexibel)` : fmtLong(i.date);
   const wopt = k => `<label class="opt who who-${k}"><input type="radio" name="ow" value="${k}" ${i.who === k ? 'checked' : ''}><span>${esc(whoName(k))}</span></label>`;
+  // Tausch-Anfrage an die jeweils andere Person (nur mit Geräte-Abgleich sinnvoll)
+  const other = i.who === 'a' ? 'b' : i.who === 'b' ? 'a' : null;
+  const openReq = Object.entries(state.requests || {}).find(([, r]) => r && r.key === i.key && r.status === 'open');
+  const reqHTML = !sync || !other || i.done ? '' : openReq
+    ? `<div class="hint" style="margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">🙋 Anfrage an ${esc(P(openReq[1].to).name)} läuft …<button class="mini" id="reqCancel" style="margin-left:auto">Zurückziehen</button></div>`
+    : `<div class="actions stack" style="margin-top:10px"><button class="btn" id="reqAsk" style="margin-right:auto">🙋 ${esc(P(other).name)} fragen: „Kannst du übernehmen?“</button></div>`;
   openModal(`
     <div class="sheet-head"><h2>${c.icon} ${esc(t.title)}</h2><button class="icon-btn" data-action="close">✕</button></div>
     <div class="item-meta" style="font-size:14px"><span>📆 ${esc(when)}</span><span>↻ ${esc(freqText(t))}</span>${t.mins ? `<span>⏱ ${t.mins} min</span>` : ''}<span>${esc(c.name)}</span></div>
@@ -917,6 +1051,19 @@ function openInstance(i){
       <button class="btn" data-action="edit" data-id="${t.id}" style="margin-right:auto">Aufgabe bearbeiten</button>
       <button class="btn primary" id="toggleBtn">${i.done ? 'Wieder öffnen' : '✓ Erledigt'}</button>
     </div>
+    ${reqHTML}
+    ${isDayInst ? `
+    <div class="section"><h3>Verschieben</h3></div>
+    <div class="card" style="box-shadow:none;background:var(--bg)">
+      <p class="muted" style="margin:0 0 10px">Nur dieser eine Termin – die Serie bleibt unverändert${t.freq.type === 'weekly' ? ' (nächste Woche wieder wie gewohnt)' : ''}.</p>
+      ${i.movedFrom ? `<p style="margin:0 0 10px;font-size:14px">↷ Ursprünglich am <b>${esc(fmtLong(i.movedFrom))}</b></p>` : ''}
+      <label class="field" style="margin-top:0"><span>Neuer Tag</span><input type="date" id="moveDate" min="${today()}" value="${addDays(i.date < today() ? today() : i.date, 1)}"></label>
+      <div class="actions stack" style="margin-top:12px">
+        ${i.movedFrom ? '<button type="button" class="btn" id="moveBack" style="margin-right:auto">↺ Zurück auf den ursprünglichen Tag</button>' : ''}
+        <button type="button" class="btn" id="moveTomorrow">Auf morgen</button>
+        <button type="button" class="btn primary" id="moveGo">Verschieben</button>
+      </div>
+    </div>` : ''}
     <div class="section"><h3>Übernehmen / tauschen</h3></div>
     <form id="handover" class="card" style="box-shadow:none;background:var(--bg)">
       <div class="field" style="margin-top:0"><span>Wer übernimmt?</span><div class="opts">${wopt('a')}${wopt('b')}${wopt('both')}</div></div>
@@ -941,7 +1088,7 @@ function openInstance(i){
         e.preventDefault();
         const w = form.querySelector('[name=ow]:checked').value;
         const sc = form.querySelector('[name=scope]:checked').value;
-        if (sc === 'one') setOverride(t, i.key, i.date, w);
+        if (sc === 'one') setOverride(t, i.key, origDate, w);
         else if (sc === 'range'){
           const until = form.until.value;
           if (!until || until < i.date) return toast('Bitte ein gültiges Enddatum wählen');
@@ -954,7 +1101,26 @@ function openInstance(i){
         delete state.overrides[i.key]; save(); closeModal(); render(); toast('Zurückgesetzt');
       });
       sheet.querySelector('#toggleBtn').addEventListener('click', () => { toggleDone(i.key); closeModal(); });
+      sheet.querySelector('#reqAsk')?.addEventListener('click', () => askTakeover(i, other));
+      sheet.querySelector('#reqCancel')?.addEventListener('click', () => {
+        delete state.requests[openReq[0]]; save(); closeModal(); render(); toast('Anfrage zurückgezogen');
+      });
+      if (isDayInst){
+        sheet.querySelector('#moveGo').addEventListener('click', () => moveInst(i, sheet.querySelector('#moveDate').value));
+        sheet.querySelector('#moveTomorrow').addEventListener('click', () => moveInst(i, addDays(today(), 1)));
+        sheet.querySelector('#moveBack')?.addEventListener('click', () => moveInst(i, origDate));
+      }
     });
+}
+
+// Einzelnen Termin auf einen anderen Tag legen; zurück auf den Ursprungstag hebt die Verschiebung auf
+function moveInst(i, to){
+  if (!to || (to < today() && to !== (i.movedFrom || i.date))) return toast('Bitte einen Tag ab heute wählen');
+  const from = i.movedFrom || i.date;
+  state.moves = state.moves || {};
+  if (to === from) delete state.moves[i.key]; else state.moves[i.key] = to;
+  save(); closeModal(); render();
+  toast(to === from ? 'Wieder am ursprünglichen Tag' : `Verschoben auf ${fmt(to, {weekday:'long', day:'numeric', month:'numeric'})}`);
 }
 
 /* ---------- Übergabe: einzeln, Zeitraum, dauerhaft ---------- */
@@ -1006,6 +1172,358 @@ function toggleDone(key){
   save(); render();
 }
 
+/* ---------- Urlaub / Pause ---------- */
+function pauseBannerHTML(d){
+  return activePauses(d).map(p => `<div class="pause-banner">🏖️<div>${esc(p.label)} · bis ${esc(fmt(p.to, {weekday:'short', day:'numeric', month:'numeric'}))}
+    <small>${p.scope === 'some' ? `${(p.sids || []).length} ${(p.sids || []).length === 1 ? 'Aufgabe' : 'Aufgaben'} pausiert` : 'Alle wiederkehrenden Aufgaben pausiert'}</small></div></div>`).join('');
+}
+function pausesHTML(){
+  const td = today();
+  const list = Object.entries(state.pauses || {}).filter(([, p]) => p && p.to >= td).sort((x, y) => x[1].from.localeCompare(y[1].from));
+  const range = p => `${fmt(p.from, {day:'numeric', month:'numeric'})} – ${fmt(p.to, {day:'numeric', month:'numeric', year:'numeric'})}`;
+  return `<div class="section"><h3>🏖️ Urlaub &amp; Pausen</h3><span class="count">${list.length || ''}</span></div>
+    ${list.length ? `<div class="list">${list.map(([id, p]) => `<div class="prow" data-action="pause-edit" data-id="${id}"><div class="ic">🏖️</div>
+      <div class="main"><b>${esc(p.label)}</b><small>${range(p)} · ${p.scope === 'some' ? `${(p.sids || []).length} ausgewählte Aufgaben` : 'alle wiederkehrenden Aufgaben'}${p.from <= td ? ' · läuft gerade' : ''}</small></div></div>`).join('')}</div>` : ''}
+    <div class="actions start" style="margin-top:8px"><button class="btn" data-action="pause-new">🏖️ Pause planen</button></div>`;
+}
+function openPauseForm(id){
+  const td = today();
+  const p = id ? state.pauses[id] : {label:'', from:td, to:addDays(td, 6), scope:'all', sids:[]};
+  const tasks = currentTasks().filter(t => PAUSABLE.includes(t.freq.type)).sort((x, y) => x.title.localeCompare(y.title, 'de'));
+  openModal(`
+    <div class="sheet-head"><h2>🏖️ ${id ? 'Pause bearbeiten' : 'Pause planen'}</h2><button class="icon-btn" data-action="close">✕</button></div>
+    <form id="pauseForm" autocomplete="off">
+      <label class="field" style="margin-top:0"><span>Anlass</span><input name="label" maxlength="40" value="${esc(p.label)}" placeholder="z. B. Urlaub Ostsee"></label>
+      <div class="row2">
+        <label class="field"><span>Von</span><input type="date" name="from" value="${p.from}"></label>
+        <label class="field"><span>Bis einschließlich</span><input type="date" name="to" value="${p.to}"></label>
+      </div>
+      <div class="field"><span>Was wird pausiert?</span><div class="opts">
+        ${opt('scope', 'all', 'Alle wiederkehrenden Aufgaben', p.scope !== 'some')}${opt('scope', 'some', 'Nur ausgewählte', p.scope === 'some')}
+      </div></div>
+      <div class="field" id="pauseTasks"><span>Aufgaben auswählen</span><div class="opts">
+        ${tasks.map(t => opt('sids', t.sid, `${cat(t.cat).icon} ${esc(t.title)}`, (p.sids || []).includes(t.sid), '', 'checkbox')).join('') || '<small>Keine wiederkehrenden Aufgaben vorhanden.</small>'}
+      </div></div>
+      <div class="hint">Pausierte Aufgaben erscheinen in diesem Zeitraum nicht, zählen nicht in der Balance und lösen keine Morgen-Nachricht aus. Einmalige und jährliche Termine (z. B. Geburtstage) bleiben bestehen. Flexible Wochen- bzw. Monatsaufgaben entfallen, wenn die Pause den Großteil der Woche bzw. des Monats abdeckt.</div>
+      <div class="actions stack rev">
+        ${id ? '<button type="button" class="btn danger" id="pauseDel">Löschen</button>' : ''}
+        <button type="button" class="btn" data-action="close">Abbrechen</button>
+        <button type="submit" class="btn primary">Speichern</button>
+      </div>
+    </form>`, sheet => {
+      const f = sheet.querySelector('#pauseForm');
+      const syncF = () => { sheet.querySelector('#pauseTasks').hidden = f.querySelector('[name=scope]:checked').value !== 'some'; };
+      f.addEventListener('change', syncF); syncF();
+      f.addEventListener('submit', e => {
+        e.preventDefault();
+        const from = f.from.value, to = f.to.value, scope = f.querySelector('[name=scope]:checked').value;
+        const sids = [...f.querySelectorAll('[name=sids]:checked')].map(x => x.value);
+        if (!from || !to || to < from) return toast('Bitte einen gültigen Zeitraum wählen');
+        if (scope === 'some' && !sids.length) return toast('Bitte mindestens eine Aufgabe auswählen');
+        state.pauses = state.pauses || {};
+        state.pauses[id || uid()] = {label: f.label.value.trim() || 'Pause', from, to, scope, sids: scope === 'some' ? sids : []};
+        save(); closeModal(); render(); toast('Pause gespeichert 🏖️');
+      });
+      sheet.querySelector('#pauseDel')?.addEventListener('click', () => {
+        if (!confirm('Diese Pause löschen?')) return;
+        delete state.pauses[id]; save(); closeModal(); render(); toast('Pause gelöscht');
+      });
+    });
+}
+
+/* ---------- Kopf leeren / Eingang ---------- */
+function ago(ts){
+  const min = Math.round((Date.now() - (ts || 0)) / 60000);
+  if (min < 2) return 'gerade eben';
+  if (min < 60) return `vor ${min} Min.`;
+  if (min < 24 * 60) return `vor ${Math.round(min / 60)} Std.`;
+  const days = Math.round(min / 1440);
+  return days === 1 ? 'gestern' : days < 14 ? `vor ${days} Tagen` : fmt(iso(new Date(ts)), {day:'numeric', month:'numeric', year:'numeric'});
+}
+function addThought(text){
+  state.inbox = state.inbox || {};
+  state.inbox[uid()] = {text, by: ui.me || '', at: Date.now()};
+  save(); render(); toast('Festgehalten 💭');
+}
+function openThought(){
+  openModal(`
+    <div class="sheet-head"><h2>💭 Gedanke festhalten</h2><button class="icon-btn" data-action="close">✕</button></div>
+    <form id="thoughtForm" autocomplete="off">
+      <label class="field" style="margin-top:0"><span>Was geht dir durch den Kopf?</span><input name="text" maxlength="200" placeholder="z. B. Jorik braucht neue Gummistiefel"></label>
+      <p class="muted">Landet im Eingang – ohne Zuständigkeit. Verteilt es später gemeinsam.</p>
+      <div class="actions stack"><button type="submit" class="btn primary">Festhalten</button></div>
+    </form>`, sheet => {
+      const f = sheet.querySelector('form');
+      setTimeout(() => f.text.focus(), 50);   // hier gewollt: man tippt 💭 ja, um sofort zu schreiben
+      f.addEventListener('submit', e => {
+        e.preventDefault();
+        const v = f.text.value.trim();
+        if (!v) return;
+        closeModal(); addThought(v);
+      });
+    });
+}
+function renderInbox(v){
+  const items = Object.entries(state.inbox || {}).filter(([, n]) => n).sort((x, y) => (y[1].at || 0) - (x[1].at || 0));
+  v.innerHTML = `
+    <form class="inbox-add" id="inboxAdd" autocomplete="off"><input name="text" maxlength="200" placeholder="💭 Was geht dir durch den Kopf?"><button class="btn primary" aria-label="Festhalten">＋</button></form>
+    <p class="muted" style="margin:10px 2px 0">Schnell festhalten, ohne gleich zu entscheiden, wer es macht. Später gemeinsam verteilen: als Aufgabe anlegen oder abhaken.</p>
+    <div class="section"><h3>Eingang</h3><span class="count">${items.length}</span></div>
+    ${items.length ? `<div class="list">${items.map(([id, n]) => `<div class="note">
+        <div class="main">${esc(n.text)}<small>${n.by && state.people[n.by] ? esc(P(n.by).name) + ' · ' : ''}${ago(n.at)}</small></div>
+        <div class="acts"><button class="mini primary" data-action="inbox-task" data-id="${id}">➜ Als Aufgabe</button><button class="mini" data-action="inbox-done" data-id="${id}">✓ Erledigt</button></div>
+      </div>`).join('')}</div>`
+      : '<div class="empty"><span class="big">🧘</span>Kopf ist leer – alles verteilt.</div>'}`;
+  v.querySelector('#inboxAdd').addEventListener('submit', e => {
+    e.preventDefault();
+    const text = e.target.text.value.trim();
+    if (text) addThought(text);
+  });
+}
+
+/* ---------- Tausch-Anfrage ---------- */
+let ghToken = null;   // optionaler GitHub-Schlüssel (in der Familien-Datenbank) für sofortige Push-Nachrichten
+// Stößt den Versand bei GitHub an (Workflow anfrage.yml). Ohne Schlüssel übernimmt das der stündliche Lauf.
+async function triggerInstantPush(){
+  const m = location.hostname.match(/^([^.]+)\.github\.io$/);
+  const repo = location.pathname.split('/').filter(Boolean)[0];
+  if (!ghToken || !m || !repo) return false;
+  try {
+    const r = await fetch(`https://api.github.com/repos/${m[1]}/${repo}/actions/workflows/anfrage.yml/dispatches`, {
+      method: 'POST', headers: {Authorization: 'Bearer ' + ghToken, Accept: 'application/vnd.github+json'}, body: JSON.stringify({ref: 'main'}),
+    });
+    return r.status === 204;
+  } catch(e) { return false; }
+}
+function askTakeover(i, to){
+  state.requests = state.requests || {};
+  state.requests[uid()] = {key: i.key, sid: i.task.sid, orig: i.movedFrom || i.date, date: i.date, title: i.task.title, from: i.who, to, status: 'open', at: Date.now()};
+  save(); closeModal(); render();
+  triggerInstantPush().then(ok => toast(ok ? `Anfrage an ${P(to).name} gesendet 🙋` : `Anfrage gespeichert – ${P(to).name} sieht sie in der App`));
+}
+function answerRequest(id, ans){
+  const r = state.requests?.[id];
+  if (!r) return toast('Anfrage nicht gefunden');
+  if (r.status !== 'open') return toast('Diese Anfrage wurde schon beantwortet');
+  if (ans === 'yes'){
+    const t = state.tasks.find(x => x.sid === r.sid && (DAY_TYPES.includes(x.freq.type) ? occursOn(x, r.orig) : active(x, r.orig, r.orig)))
+      || state.tasks.find(x => x.sid === r.sid);
+    if (t) setOverride(t, r.key, r.orig, r.to);
+  }
+  state.requests[id] = {...r, status: ans, answeredAt: Date.now()};
+  save(); render();
+  triggerInstantPush();
+  toast(ans === 'yes' ? `Eingetragen: ${P(r.to).name} übernimmt ✓` : 'Abgelehnt – Bescheid geht raus');
+}
+function requestsHTML(){
+  const now = Date.now(), yesterday = addDays(today(), -1);
+  return Object.entries(state.requests || {})
+    .filter(([, r]) => r && (r.status === 'open' ? r.date >= yesterday : now - (r.answeredAt || 0) < 6 * 3600e3))
+    .sort((x, y) => (x[1].at || 0) - (y[1].at || 0))
+    .map(([id, r]) => r.status === 'open'
+      ? `<div class="req"><div class="txt">🙋 ${esc(P(r.from).name)} fragt ${esc(P(r.to).name)}: „${esc(r.title)}“ übernehmen?<small>${esc(fmtLong(r.date))}</small></div>
+          <button class="btn primary" data-action="req-answer" data-id="${id}" data-a="yes">✓ Ja, übernehme ich</button>
+          <button class="btn" data-action="req-answer" data-id="${id}" data-a="no">Nein</button></div>`
+      : `<div class="req" style="background:color-mix(in srgb,${r.status === 'yes' ? '#10b981' : '#dc2626'} 13%,var(--card))"><div class="txt">${r.status === 'yes' ? '✅' : '❌'} ${esc(P(r.to).name)} ${r.status === 'yes' ? 'übernimmt' : 'kann leider nicht'}: „${esc(r.title)}“<small>${esc(fmtLong(r.date))}</small></div></div>`)
+    .join('');
+}
+// Alte Anfragen nach 14 Tagen aufräumen
+function cleanupRequests(){
+  const limit = Date.now() - 14 * 864e5;
+  const old = Object.keys(state.requests || {}).filter(id => (state.requests[id]?.at || 0) < limit);
+  old.forEach(id => delete state.requests[id]);
+  if (old.length) save();
+}
+
+/* ---------- Gesundheits-Logbuch ---------- */
+const SUBJECTS = [
+  {id:'Jorik',   icon:'🧒'},
+  {id:'Pax',     icon:'🐈'},
+  {id:'Rhonna',  icon:'🐈‍⬛'},
+  {id:'Pferde',  icon:'🐎'},
+  {id:'Familie', icon:'👨‍👩‍👦'},
+];
+const subjIcon = s => SUBJECTS.find(x => x.id === s)?.icon || '📋';
+const fmtDate = d => fmt(d, {day:'numeric', month:'numeric', year:'numeric'});
+function addInterval(d, n, unit){
+  if (unit === 'w') return addDays(d, 7 * n);
+  const D = parse(d), months = unit === 'y' ? 12 * n : n;
+  const target = new Date(D.getFullYear(), D.getMonth() + months, 1);
+  return iso(new Date(target.getFullYear(), target.getMonth(), Math.min(D.getDate(), daysInMonth(target.getFullYear(), target.getMonth()))));
+}
+const unitName = h => ({w: ['Woche', 'Wochen'], m: ['Monat', 'Monate'], y: ['Jahr', 'Jahre']})[h.unit || 'm'][h.every === 1 ? 0 : 1];
+function dueState(h){
+  if (!h.next) return 'none';
+  const diff = daysBetween(today(), h.next);
+  return diff < 0 ? 'over' : diff <= 30 ? 'soon' : 'ok';
+}
+function relDue(h){
+  if (!h.next) return 'kein Termin';
+  const diff = daysBetween(today(), h.next);
+  if (diff < 0) return diff === -1 ? 'seit gestern fällig' : `seit ${-diff} Tagen fällig`;
+  if (diff === 0) return 'heute fällig';
+  if (diff === 1) return 'morgen fällig';
+  if (diff < 21) return `in ${diff} Tagen`;
+  if (diff < 70) return `in ${Math.round(diff / 7)} Wochen`;
+  return `in ${Math.round(diff / 30.4)} Monaten`;
+}
+// Einträge, die in den nächsten n Tagen fällig sind (inkl. überfällige), sortiert
+const healthDue = n => Object.entries(state.health || {})
+  .filter(([, h]) => h && h.next && h.next <= addDays(today(), n))
+  .sort((x, y) => x[1].next.localeCompare(y[1].next));
+function logRowHTML(id, h){
+  return `<div class="log st-${dueState(h)}" data-action="log-edit" data-id="${id}">
+    <div class="ic">${subjIcon(h.subject)}</div>
+    <div class="main"><b>${esc(h.title)}</b><small>${esc(h.subject)}${h.last ? ' · zuletzt ' + fmtDate(h.last) : ''}${h.every ? ` · alle ${h.every} ${unitName(h)}` : ''}${h.next ? ' · fällig ' + fmtDate(h.next) : ''}</small></div>
+    <span class="st-pill">${relDue(h)}</span>
+    <button class="mini" data-action="log-done" data-id="${id}" title="Erledigt eintragen">✓</button>
+  </div>`;
+}
+function renderLog(v){
+  const all = Object.entries(state.health || {}).filter(([, h]) => h);
+  const subs = [...new Set(all.map(([, h]) => h.subject))].sort((x, y) => x.localeCompare(y, 'de'));
+  const f = subs.includes(ui.logFilter) ? ui.logFilter : 'all';
+  const list = all.filter(([, h]) => f === 'all' || h.subject === f)
+    .sort((x, y) => (x[1].next || '9999').localeCompare(y[1].next || '9999') || x[1].title.localeCompare(y[1].title, 'de'));
+  v.innerHTML = `
+    ${subs.length > 1 ? `<div class="filter" style="margin:0 0 4px">${['all', ...subs].map(s => `<button class="${f === s ? 'active' : ''}" data-action="logfilter" data-s="${esc(s)}">${s === 'all' ? 'Alle' : subjIcon(s) + ' ' + esc(s)}</button>`).join('')}</div>` : ''}
+    <p class="muted" style="margin:6px 2px 12px">Impfungen, Wurmkur, Hufschmied, U-Untersuchungen … mit „zuletzt am“ und „nächstes Mal fällig“. Fällige Einträge erscheinen auch in der Tagesansicht und der Morgen-Nachricht.</p>
+    ${list.length ? `<div class="list">${list.map(([id, h]) => logRowHTML(id, h)).join('')}</div>`
+      : '<div class="empty"><span class="big">🩺</span>Noch keine Einträge.</div>'}
+    <div class="actions start" style="margin-top:14px"><button class="btn primary" data-action="log-new">＋ Eintrag anlegen</button></div>`;
+}
+function openLogForm(id){
+  const h = id ? state.health[id] : {subject: 'Jorik', title: '', last: '', every: 0, unit: 'm', next: '', notes: '', history: []};
+  const known = SUBJECTS.some(s => s.id === h.subject);
+  openModal(`
+    <div class="sheet-head"><h2>🩺 ${id ? 'Eintrag bearbeiten' : 'Neuer Logbuch-Eintrag'}</h2><button class="icon-btn" data-action="close">✕</button></div>
+    <form id="logForm" autocomplete="off">
+      <div class="field" style="margin-top:0"><span>Für wen?</span><div class="opts">
+        ${SUBJECTS.map(s => opt('subj', s.id, `${s.icon} ${s.id}`, h.subject === s.id)).join('')}${opt('subj', '__other', '✏️ Andere', !known)}
+      </div><input name="subjOther" maxlength="30" placeholder="Name" value="${known ? '' : esc(h.subject)}"></div>
+      <label class="field"><span>Was?</span><input name="title" maxlength="60" value="${esc(h.title)}" placeholder="z. B. Impfung, Wurmkur, Hufschmied, U-Untersuchung"></label>
+      <div class="row2">
+        <label class="field"><span>Zuletzt am <em>(optional)</em></span><input type="date" name="last" value="${h.last || ''}" max="${today()}"></label>
+        <div class="field"><span>Wiederholen alle</span><div style="display:flex;gap:8px">
+          <input type="number" name="every" min="0" max="99" value="${h.every || ''}" placeholder="–" style="width:84px">
+          <select name="unit">${[['w', 'Wochen'], ['m', 'Monate'], ['y', 'Jahre']].map(([u, l]) => `<option value="${u}" ${(h.unit || 'm') === u ? 'selected' : ''}>${l}</option>`).join('')}</select>
+        </div><small>Leer lassen, wenn es keinen festen Rhythmus gibt.</small></div>
+      </div>
+      <label class="field"><span>Nächstes Mal fällig</span><input type="date" name="next" value="${h.next || ''}"><small>Wird aus „Zuletzt am“ + Rhythmus berechnet – oder trag einen festen Termin ein.</small></label>
+      <label class="field"><span>Notizen <em>(optional)</em></span><textarea name="notes" rows="2" placeholder="Tierarzt, Praxis, Impfstoff, Chargennummer …">${esc(h.notes)}</textarea></label>
+      ${(h.history || []).length ? `<div class="hint">📜 Verlauf: ${h.history.map(fmtDate).join(' · ')}</div>` : ''}
+      <div class="actions stack rev">
+        ${id ? '<button type="button" class="btn danger" id="logDel">Löschen</button>' : ''}
+        <button type="button" class="btn" data-action="close">Abbrechen</button>
+        <button type="submit" class="btn primary">Speichern</button>
+      </div>
+    </form>`, sheet => {
+      const f = sheet.querySelector('#logForm');
+      let nextTouched = false;
+      const recalc = () => {
+        const n = parseInt(f.every.value) || 0;
+        if (!nextTouched && f.last.value && n) f.next.value = addInterval(f.last.value, n, f.unit.value);
+      };
+      const syncF = () => { f.subjOther.hidden = f.querySelector('[name=subj]:checked').value !== '__other'; };
+      f.addEventListener('input', e => {
+        if (e.target.name === 'next') nextTouched = true;
+        if (['last', 'every', 'unit'].includes(e.target.name)){ nextTouched = false; recalc(); }
+      });
+      f.addEventListener('change', e => { syncF(); if (e.target.name === 'unit'){ nextTouched = false; recalc(); } });
+      syncF();
+      f.addEventListener('submit', e => {
+        e.preventDefault();
+        const subjSel = f.querySelector('[name=subj]:checked').value;
+        const subject = subjSel === '__other' ? (f.subjOther.value.trim() || 'Andere') : subjSel;
+        const title = f.title.value.trim();
+        if (!title){ f.title.focus(); return toast('Bitte eintragen, worum es geht'); }
+        const every = Math.max(0, parseInt(f.every.value) || 0), last = f.last.value, unit = f.unit.value;
+        let next = f.next.value;
+        if (!next && last && every) next = addInterval(last, every, unit);
+        const history = [...new Set([...(h.history || []), ...(last ? [last] : [])])].sort();
+        state.health = state.health || {};
+        state.health[id || uid()] = {subject, title, last, every, unit, next, notes: f.notes.value.trim(), history};
+        save(); closeModal(); render(); toast('Gespeichert');
+      });
+      sheet.querySelector('#logDel')?.addEventListener('click', () => {
+        if (!confirm(`„${h.title}“ (${h.subject}) löschen?`)) return;
+        delete state.health[id]; save(); closeModal(); render(); toast('Eintrag gelöscht');
+      });
+    });
+}
+function openLogDone(id){
+  const h = state.health[id];
+  openModal(`
+    <div class="sheet-head"><h2>${subjIcon(h.subject)} ${esc(h.title)} erledigt</h2><button class="icon-btn" data-action="close">✕</button></div>
+    <label class="field" style="margin-top:0"><span>Erledigt am</span><input type="date" id="logDoneDate" value="${today()}" max="${today()}"></label>
+    <p class="muted">${h.every ? `Nächster Termin wird automatisch berechnet (alle ${h.every} ${unitName(h)}).` : 'Ohne festen Rhythmus – den nächsten Termin könnt ihr danach beim Bearbeiten eintragen.'}</p>
+    <div class="actions stack"><button class="btn primary" id="logDoneGo">✓ Eintragen</button></div>`, sheet => {
+      sheet.querySelector('#logDoneGo').addEventListener('click', () => {
+        const d = sheet.querySelector('#logDoneDate').value || today();
+        const cur = state.health[id];
+        const last = !cur.last || d > cur.last ? d : cur.last;
+        const next = cur.every ? addInterval(last, cur.every, cur.unit || 'm') : (cur.next && cur.next > d ? cur.next : '');
+        state.health[id] = {...cur, last, next, history: [...new Set([...(cur.history || []), d])].sort()};
+        save(); closeModal(); render();
+        toast(next ? `Eingetragen – nächstes Mal am ${fmtDate(next)}` : 'Eingetragen');
+      });
+    });
+}
+
+/* ---------- Kühlschrank-Modus (pro Gerät) ---------- */
+const clock = () => new Date().toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit'});
+let wakeLock = null;
+async function keepAwake(){
+  if (!ui.kiosk || document.hidden || !('wakeLock' in navigator)) return;
+  try { wakeLock = await navigator.wakeLock.request('screen'); } catch(e) {}
+}
+function releaseAwake(){ try { wakeLock && wakeLock.release(); } catch(e) {} wakeLock = null; }
+function setKiosk(on){
+  ui.kiosk = on; saveUI(); closeModal();
+  if (on){
+    ui.cursor = today();
+    document.documentElement.requestFullscreen?.().catch(() => {});
+    keepAwake();
+  } else {
+    releaseAwake();
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  }
+  render(); window.scrollTo({top: 0});
+}
+function renderKiosk(v){
+  const td = today();
+  ui.cursor = td;
+  const all = [...dayInsts(td), ...overdueInsts()];
+  const weekFlex = weekFlexInsts(monday(td));
+  const dueLogs = healthDue(14);
+  const inboxN = Object.keys(state.inbox || {}).length;
+  const col = (k, label) => {
+    const items = sortInsts(all.filter(i => i.who === k));
+    const done = items.filter(i => i.done).length;
+    return `<div class="k-col who-${k}">
+      <div class="k-col-head"><div class="avatar">${k === 'both' ? '∞' : esc(initials(k))}</div>
+        <div><b>${esc(label)}</b><small>${items.length ? `${done} von ${items.length} erledigt` : 'Heute frei'}</small></div></div>
+      <div class="k-bar"><i style="width:${items.length ? done / items.length * 100 : 0}%"></i></div>
+      ${items.length ? `<div class="list">${items.map(i => itemHTML(i, {showDate: i.date < td})).join('')}</div>` : '<div class="k-empty">🌿 Nichts zu tun</div>'}
+    </div>`;
+  };
+  v.innerHTML = `
+    <div class="k-head">
+      <div><div class="k-time" id="kTime">${clock()}</div><div class="k-date">${esc(fmtLong(td))}</div></div>
+      <div class="k-info">
+        ${inboxN ? `<span class="k-pill">💭 ${inboxN} im Eingang</span>` : ''}
+        <button class="k-pill" data-action="thought">💭 Gedanke</button>
+        <button class="k-pill" data-action="kiosk-off" title="Kühlschrank-Modus beenden">✕ Beenden</button>
+      </div>
+    </div>
+    ${pauseBannerHTML(td)}${requestsHTML()}
+    <div class="k-cols">${col('a', P('a').name)}${col('both', 'Gemeinsam')}${col('b', P('b').name)}</div>
+    <div class="k-foot">
+      ${weekFlex.length ? `<div class="k-col"><div class="section" style="margin:0"><h3>Diese Woche · flexibel</h3></div><div class="list">${sortInsts(weekFlex).map(i => itemHTML(i)).join('')}</div></div>` : ''}
+      ${dueLogs.length ? `<div class="k-col"><div class="section" style="margin:0"><h3>🩺 Logbuch · bald fällig</h3></div><div class="list">${dueLogs.map(([id, h]) => logRowHTML(id, h)).join('')}</div></div>` : ''}
+    </div>`;
+}
+
 /* ---------- Einstellungen ---------- */
 function openSettings(first){
   const sw = (k) => `<div class="swatches">${COLORS.map(c => `<label class="opt"><input type="radio" name="c${k}" value="${c}" ${P(k).color === c ? 'checked' : ''}><span style="background:${c}"></span></label>`).join('')}</div>`;
@@ -1028,8 +1546,17 @@ function openSettings(first){
       ${[['auto','🌗 Automatisch'],['light','☀️ Hell'],['dark','🌙 Dunkel']].map(([t, l]) => `<button class="${ui.theme === t ? 'active' : ''}" data-action="theme" data-t="${t}">${l}</button>`).join('')}
     </div>
     <p class="muted" style="margin-top:8px">Gilt nur für dieses Gerät. „Automatisch“ folgt der Einstellung von Android.</p>
+    <div class="section"><h3>Dieses Gerät gehört</h3></div>
+    <div class="seg-switch">
+      ${[['a', P('a').name], ['b', P('b').name], ['', 'Gemeinsam']].map(([k, l]) => `<button class="${(ui.me || '') === k ? 'active' : ''}" data-action="me" data-k="${k}">${esc(l)}</button>`).join('')}
+    </div>
+    <p class="muted" style="margin-top:8px">Wird z. B. im Eingang als Absender angezeigt. Für das gemeinsame Tablet „Gemeinsam“ wählen.</p>
+    <div class="section"><h3>📺 Kühlschrank-Modus</h3></div>
+    <p class="muted">Großansicht für ein fest aufgestelltes Tablet (quer): beide Personen nebeneinander, große Schrift, der Bildschirm bleibt an und springt um Mitternacht auf den neuen Tag. Gilt nur für dieses Gerät – die Handys bleiben unverändert. Beenden über „✕ Beenden“ oben rechts.</p>
+    <div class="actions start"><button class="btn primary" data-action="kiosk-on">📺 Kühlschrank-Modus starten</button></div>
     <div id="syncSection">${syncSectionHTML()}</div>
     <div id="pushSection">${pushSectionHTML()}</div>
+    <div id="reqSection">${reqSectionHTML()}</div>
     <div class="section"><h3>Datensicherung</h3></div>
     <p style="color:var(--muted);font-size:14px;margin:0 0 10px">Alles wird automatisch auf diesem Gerät im Browser gespeichert. Erstellt zur Sicherheit ab und zu ein Backup – damit könnt ihr die Daten auch auf ein anderes Gerät übertragen.</p>
     <div class="actions" style="justify-content:flex-start;margin-top:0">
@@ -1087,9 +1614,11 @@ function importBackup(e){
 
 function addExamples(){
   const td = today();
+  const THINK = ['Essensplan für die Woche', 'Kita-/Schul-Infos & Elternbriefe sichten', 'Arzt- & Vorsorgetermine checken', 'Geburtstage & Geschenke planen'];
   const mk = (title, desc, catId, mins, assignee, freq) => {
     const id = uid();
-    state.tasks.push({id, sid:id, origin:td, start:td, end:null, created:Date.now(), title, desc, cat:catId, mins, assignee, altStart:'a', freq:Object.assign({every:1}, freq)});
+    state.tasks.push({id, sid:id, origin:td, start:td, end:null, created:Date.now(), title, desc, cat:catId, mins, assignee, altStart:'a',
+      kind: THINK.includes(title) ? 'think' : 'do', freq:Object.assign({every:1}, freq)});
   };
   mk('Spülmaschine ausräumen', '', 'haushalt', 10, 'alt', {type:'daily'});
   mk('Brotdosen & Kita-Tasche packen', 'Wechselkleidung, Trinkflasche, Snack', 'kinder', 15, 'a', {type:'weekdays'});
@@ -1159,6 +1688,28 @@ document.addEventListener('click', e => {
         stopSync(); openSettings(false); toast('Verbindung getrennt');
       }
       break;
+    case 'me':
+      ui.me = el.dataset.k; saveUI();
+      el.parentElement.querySelectorAll('button').forEach(b => b.classList.toggle('active', b === el));
+      break;
+    case 'kiosk-on':   setKiosk(true); break;
+    case 'kiosk-off':  setKiosk(false); break;
+    case 'thought':    openThought(); break;
+    case 'inbox-task': openTaskForm(null, {title: state.inbox[el.dataset.id]?.text || '', inboxId: el.dataset.id}); break;
+    case 'inbox-done': delete state.inbox[el.dataset.id]; save(); render(); toast('Erledigt ✓'); break;
+    case 'pause-new':  openPauseForm(); break;
+    case 'pause-edit': openPauseForm(el.dataset.id); break;
+    case 'log-new':    openLogForm(); break;
+    case 'log-edit':   openLogForm(el.dataset.id); break;
+    case 'log-done':   e.stopPropagation(); openLogDone(el.dataset.id); break;
+    case 'logfilter':  ui.logFilter = el.dataset.s; render(); break;
+    case 'req-answer': answerRequest(el.dataset.id, el.dataset.a); break;
+    case 'gh-save': {
+      const v = ($('#ghTok')?.value || '').trim();
+      if (!famRef) { toast('Gerade keine Verbindung zur Datenbank'); break; }
+      famRef.child('settings/ghToken').set(v || null).then(() => toast(v ? 'Schlüssel gespeichert – gilt für alle Geräte' : 'Schlüssel entfernt'));
+      break;
+    }
     case 'push-on': case 'push-save': pushEnable(); break;
     case 'push-off':  pushDisable(); break;
     case 'push-test': pushTest(); break;
@@ -1178,7 +1729,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
 let tx = null, ty = null;
 $('#view').addEventListener('touchstart', e => { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, {passive:true});
 $('#view').addEventListener('touchend', e => {
-  if (tx === null || ui.view === 'tasks') return;
+  if (tx === null || ui.kiosk || ['tasks', 'inbox', 'log'].includes(ui.view)) return;
   const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
   if (Math.abs(dx) > 70 && Math.abs(dy) < 50) step(dx < 0 ? 1 : -1);
   tx = null;
@@ -1187,8 +1738,15 @@ $('#view').addEventListener('touchend', e => {
 // Bei Rückkehr in die App: auf "heute" aktualisieren, falls der Tag gewechselt hat
 let lastDay = today();
 document.addEventListener('visibilitychange', () => {
-  if (!document.hidden && today() !== lastDay){ lastDay = today(); ui.cursor = today(); render(); }
+  if (document.hidden) return;
+  keepAwake();   // Bildschirmsperre gibt den Wake-Lock frei – im Kühlschrank-Modus neu anfordern
+  if (today() !== lastDay){ lastDay = today(); ui.cursor = today(); render(); }
 });
+// Uhr im Kühlschrank-Modus + Tageswechsel um Mitternacht
+setInterval(() => {
+  if (today() !== lastDay){ lastDay = today(); ui.cursor = today(); render(); return; }
+  const el = $('#kTime'); if (el) el.textContent = clock();
+}, 15000);
 
 /* =========================================================
    Synchronisierung über Firebase Realtime Database
@@ -1215,24 +1773,41 @@ const normPeople = p => ({
 const normTask = t => ({
   id:t.id, sid:t.sid || t.id, origin:t.origin || t.start, start:t.start, end:t.end || null, created:t.created || 0,
   title:t.title || '', desc:t.desc || '', cat:t.cat || 'sonstiges', mins:t.mins || 0,
-  assignee:t.assignee || 'a', altStart:t.altStart || 'a',
+  assignee:t.assignee || 'a', altStart:t.altStart || 'a', kind:t.kind === 'think' ? 'think' : 'do',
   freq:{type:t.freq.type, every:t.freq.every || 1, days:[...(t.freq.days || [])], dom:t.freq.dom || 1, date:t.freq.date || ''},
 });
+// Frei strukturierte Sammlungen (je Eintrag ein Pfad in der Cloud)
+const EXTRA = ['pauses', 'inbox', 'requests', 'health'];
+// Stabile Schreibweise wie Firebase sie zurückliefert: Schlüssel sortiert, leere Werte/Listen entfernt
+function canon(v){
+  if (Array.isArray(v)){ const a = v.map(canon).filter(x => x !== undefined); return a.length ? a : undefined; }
+  if (v && typeof v === 'object'){
+    const o = {};
+    Object.keys(v).sort().forEach(k => { const c = canon(v[k]); if (c !== undefined) o[k] = c; });
+    return Object.keys(o).length ? o : undefined;
+  }
+  return v === null || v === undefined ? undefined : v;
+}
 function flatten(s){
   const m = {people: JSON.stringify(normPeople(s.people))};
   s.tasks.forEach(t => m['tasks/' + t.id] = JSON.stringify(normTask(t)));
   for (const k in s.done) m['done/' + k] = JSON.stringify({at: s.done[k]?.at || 0});
   for (const k in s.overrides) m['overrides/' + k] = JSON.stringify(String(s.overrides[k]));
+  for (const k in s.moves || {}) m['moves/' + k] = JSON.stringify(String(s.moves[k]));
+  EXTRA.forEach(c => { for (const k in s[c] || {}){ const v = canon(s[c][k]); if (v !== undefined) m[c + '/' + k] = JSON.stringify(v); } });
   return m;
 }
 function unflatten(m){
-  const s = {people: normPeople(null), tasks: [], done: {}, overrides: {}};
+  const s = {people: normPeople(null), tasks: [], done: {}, overrides: {}, moves: {}};
+  EXTRA.forEach(c => s[c] = {});
   for (const [p, v] of Object.entries(m)){
     const val = JSON.parse(v), i = p.indexOf('/'), sec = i < 0 ? p : p.slice(0, i), k = p.slice(i + 1);
     if (p === 'people') s.people = val;
     else if (sec === 'tasks') s.tasks.push(val);
     else if (sec === 'done') s.done[k] = val;
     else if (sec === 'overrides') s.overrides[k] = val;
+    else if (sec === 'moves') s.moves[k] = val;
+    else if (EXTRA.includes(sec)) s[sec][k] = val;
   }
   s.tasks.sort((x, y) => x.created - y.created);
   return s;
@@ -1240,7 +1815,8 @@ function unflatten(m){
 const remoteFlat = val => flatten({
   people: val?.people,
   tasks: Object.values(val?.tasks || {}).filter(t => t && t.freq).map(normTask),
-  done: val?.done || {}, overrides: val?.overrides || {},
+  done: val?.done || {}, overrides: val?.overrides || {}, moves: val?.moves || {},
+  ...Object.fromEntries(EXTRA.map(c => [c, val?.[c] || {}])),
 });
 function diffFlat(b, c){
   const out = {};
@@ -1266,6 +1842,7 @@ function onRemote(snap){
   saveLocal();
   if (Object.keys(toPush).length) pushPaths(toPush);
   render();
+  handlePendingAnswer();
 }
 function pushPaths(p){
   if (!famRef) return;
@@ -1306,6 +1883,7 @@ async function startSync(){
     const db = fbApp.database();
     db.ref('.info/connected').on('value', s => { if (syncStatus !== 'error') setStatus(s.val() ? 'online' : 'offline'); });
     famRef = db.ref('families/' + sync.family);
+    famRef.child('settings/ghToken').on('value', s => { ghToken = s.val() || null; const r = $('#reqSection'); if (r) r.innerHTML = reqSectionHTML(); });
     famRef.on('value', onRemote, e => { famRef = null; setStatus('error', 'Zugriff verweigert. Sind die Datenbank-Regeln aus der Anleitung veröffentlicht? (' + e.message + ')'); });
   } catch(e){
     famRef = null;
@@ -1342,6 +1920,7 @@ function setStatus(s, err = ''){
   ind.title = statusText();
   const sec = $('#syncSection'); if (sec) sec.innerHTML = syncSectionHTML();
   refreshPushSection();
+  const rs = $('#reqSection'); if (rs) rs.innerHTML = reqSectionHTML();
 }
 function statusText(){
   return ({online:'Verbunden – alles wird automatisch abgeglichen', offline:'Offline – Änderungen werden später übertragen',
@@ -1519,21 +2098,43 @@ async function pushDisable(){
 }
 async function pushTest(){
   if (!await askPermission()) return;
-  const msg = buildDigest(pushForm().person, today());
+  const msg = buildDigest(pushForm().person, today()) || {title: '🏖️ Pause', body: 'Heute ist alles pausiert – an solchen Tagen kommt keine Morgen-Nachricht.'};
   (await navigator.serviceWorker.ready).showNotification(msg.title, {body:msg.body, icon:'icon-192.png', badge:'badge-96.png', tag:'daily', data:{url:'./?view=day'}});
+}
+
+function reqSectionHTML(){
+  if (!sync) return '';
+  const onPages = /\.github\.io$/.test(location.hostname);
+  return `<div class="section"><h3>🙋 Tausch-Anfragen sofort zustellen</h3></div>
+    <p class="muted">Optional. Ohne Schlüssel erscheinen Anfragen sofort in der geöffneten App und als Push-Nachricht spätestens mit dem nächsten stündlichen Lauf. Mit GitHub-Schlüssel kommt die Nachricht nach etwa einer Minute (Anleitung, Teil 6). Der Schlüssel gilt für alle verbundenen Geräte.</p>
+    <div class="syncbox"><span class="sdot ${ghToken ? 'online' : ''}"></span>${ghToken ? 'Schlüssel eingerichtet' : 'Kein Schlüssel hinterlegt'}${onPages ? '' : ' · funktioniert nur in der App unter github.io'}</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <input type="password" id="ghTok" placeholder="${ghToken ? 'Neuen Schlüssel einfügen …' : 'github_pat_…'}" autocomplete="off" style="flex:1;min-width:200px;padding:12px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg)">
+      <button class="btn" data-action="gh-save">Speichern</button>
+    </div>`;
+}
+
+// Antwort direkt aus der Push-Nachricht ("Ja"/"Nein"): ?req=<id>&answer=yes|no
+let pendingAnswer = null;
+function handlePendingAnswer(){
+  if (!pendingAnswer || !state.requests?.[pendingAnswer.id]) return;   // ggf. erst nach dem Abgleich vorhanden
+  const p = pendingAnswer; pendingAnswer = null;
+  if (p.answer === 'yes' || p.answer === 'no') answerRequest(p.id, p.answer);
 }
 
 /* =========================================================
    Start
    ========================================================= */
-// Aus der Benachrichtigung geöffnet → direkt die Tagesansicht von heute
-const startView = new URLSearchParams(location.search).get('view');
-if (['day','week','month','tasks','balance'].includes(startView)){
-  ui.view = startView; saveUI();
-  history.replaceState(null, '', location.pathname + location.hash);
-}
+// Aus einer Benachrichtigung geöffnet → passende Ansicht bzw. Antwort auf eine Tausch-Anfrage
+const qp = new URLSearchParams(location.search);
+if (VIEWS[qp.get('view')]){ ui.view = qp.get('view'); saveUI(); }
+if (qp.get('req')){ pendingAnswer = {id: qp.get('req'), answer: qp.get('answer')}; ui.view = 'day'; }
+if (location.search) history.replaceState(null, '', location.pathname + location.hash);
 if (!storageOK) showBanner('Dieser Browser erlaubt kein dauerhaftes Speichern (privater Modus?). Änderungen gehen beim Schließen verloren.');
+cleanupRequests();
 render();
+handlePendingAnswer();
+keepAwake();
 setStatus(syncStatus);
 const joined = checkJoinLink();
 if (!state.setupDone && !joined) openSettings(true);
