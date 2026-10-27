@@ -207,7 +207,8 @@ main{max-width:1240px;margin:0 auto;padding:12px 16px}
 .det-desc{white-space:pre-wrap;background:var(--bg);border-radius:12px;padding:12px 14px;margin:10px 0}
 
 /* ---------- Sync ---------- */
-.sync-ind{position:relative}
+.sync-ind{position:relative;display:grid;cursor:default}
+.sync-ind:hover{background:none}
 .sdot{width:10px;height:10px;border-radius:50%;display:inline-block;flex:none;background:#9ca3af}
 .sdot.online{background:#10b981}.sdot.offline{background:#f59e0b}.sdot.connecting{background:#60a5fa}.sdot.error{background:#dc2626}
 .sync-ind .sdot{position:absolute;right:5px;bottom:6px;border:2px solid var(--bg);width:12px;height:12px}
@@ -260,7 +261,7 @@ main{max-width:1240px;margin:0 auto;padding:12px 16px}
       <button data-view="tasks"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6h12M9 12h12M9 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg><span>Aufgaben</span></button>
       <button data-view="balance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M7 21h10M5 7h14M5 7l-3 7a4 4 0 0 0 6 0zM19 7l-3 7a4 4 0 0 0 6 0z"/></svg><span>Balance</span></button>
     </nav>
-    <button class="icon-btn sync-ind" id="syncInd" data-action="settings" title="Synchronisierung" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H7a5 5 0 1 1 1.1-9.9A6 6 0 0 1 19.6 11 4 4 0 0 1 17.5 19z"/></svg><span class="sdot"></span></button>
+    <span class="icon-btn sync-ind" id="syncInd" role="img" title="Synchronisierung" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H7a5 5 0 1 1 1.1-9.9A6 6 0 0 1 19.6 11 4 4 0 0 1 17.5 19z"/></svg><span class="sdot"></span></span>
     <button class="icon-btn" data-action="settings" title="Einstellungen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
   </div>
 </header>
@@ -653,7 +654,8 @@ function renderMonth(v){
 /* ---------- Aufgabenverwaltung ---------- */
 function currentTasks(){
   const td = today();
-  return state.tasks.filter(t => !t.end || t.end >= td)
+  // je Serie nur die neueste Version zeigen – sonst bearbeitet man versehentlich die auslaufende
+  return latestPerSeries(state.tasks.filter(t => !t.end || t.end >= td))
     .filter(t => !(t.freq.type === 'once' && t.freq.date < td && state.done[`${t.sid}|${t.freq.date}`]));
 }
 function renderTasks(v){
@@ -874,16 +876,19 @@ function submitTask(form, existing){
     const id = uid();
     state.tasks.push({id, sid:id, origin:start, start, end:null, created:Date.now(), ...data});
     toast('Aufgabe angelegt');
-  } else if (existing.start >= td){
-    // Noch nicht begonnen: direkt anpassen
-    Object.assign(existing, data, {start});
-    if (!state.tasks.some(t => t.sid === existing.sid && t !== existing)) existing.origin = start;
-    toast('Gespeichert');
+  } else if (existing.start >= td || !Object.keys(state.done).some(k => k.startsWith(existing.sid + '|'))){
+    // Noch nicht begonnen bzw. noch nie abgehakt: direkt anpassen (keine Historie zu bewahren)
+    const keepStart = existing.start < td && start === td;   // Datum nicht angefasst → Rhythmus beibehalten
+    const otherVersions = state.tasks.some(t => t.sid === existing.sid && t !== existing);
+    if (!keepStart && (start !== existing.start || !otherVersions)) existing.origin = start;
+    Object.assign(existing, data, {start: keepStart ? existing.start : start});
+    toast(keepStart || start === td ? 'Gespeichert' : `Gespeichert – startet am ${fmtShort(start)}`);
   } else {
-    // Bereits laufend: alte Version endet, neue Version gilt ab "start"
+    // Bereits laufend mit Historie: alte Version endet, neue Version gilt ab "start".
+    // Wurde ein späterer Start gewählt, beginnt der Rhythmus ab diesem Datum neu.
     existing.end = addDays(start, -1);
     const rhythmChanged = existing.freq.type !== freq.type || (existing.freq.every || 1) !== freq.every;
-    state.tasks.push({id:uid(), sid:existing.sid, origin: rhythmChanged ? start : existing.origin, start, end:null, created:Date.now(), ...data});
+    state.tasks.push({id:uid(), sid:existing.sid, origin: rhythmChanged || start !== td ? start : existing.origin, start, end:null, created:Date.now(), ...data});
     toast(start === td ? 'Gespeichert – gilt ab heute' : `Gespeichert – gilt ab ${fmtShort(start)}`);
   }
   save(); closeModal(); render();
