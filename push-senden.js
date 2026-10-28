@@ -24,7 +24,7 @@ function loadCore(){
   const ctx = vm.createContext({state: null});
   vm.runInContext(code, ctx);
   // const-Werte sind keine Eigenschaften des Kontexts – daher explizit herausreichen
-  const api = vm.runInContext('({today, VAPID_PUBLIC, buildDigest, fmt})', ctx);
+  const api = vm.runInContext('({today, VAPID_PUBLIC, buildDigest, buildReminder, REMIND_HOUR, fmt})', ctx);
   return {...api, setState: s => { ctx.state = s; }};
 }
 
@@ -135,6 +135,17 @@ async function morning(db, core){
     if (!FORCE) await db.patch(`push/${id}`, {last: today});
   }
   console.log(`${sent} Morgen-Nachricht(en) verschickt.`);
+
+  // Abend-Erinnerung für noch offene Aufgaben mit „Erinnern“ (verspätete Läufe holen bis zu 2 Std. nach)
+  if (!FORCE && (hour < core.REMIND_HOUR || hour - core.REMIND_HOUR > 2)) return;
+  let reminded = 0;
+  for (const [id, dev] of Object.entries(data.push)){
+    if (!dev || !dev.sub || (!FORCE && dev.lastRemind === today)) continue;
+    const msg = core.buildReminder(dev.person, today);
+    if (msg && await send(db, id, dev, {...msg, url: './?view=day', tag: 'remind'})) reminded++;
+    if (!FORCE) await db.patch(`push/${id}`, {lastRemind: today});
+  }
+  console.log(`${reminded} Abend-Erinnerung(en) verschickt.`);
 }
 
 async function main(){

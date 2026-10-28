@@ -129,6 +129,8 @@ main{max-width:1240px;margin:0 auto;padding:12px 16px}
 .mcell.today{outline:2.5px solid var(--text);outline-offset:-2.5px}
 .mcell .num{font-size:13px;font-weight:700;padding:0 2px 2px;display:flex;justify-content:space-between}
 .mcell .num small{font-weight:600;color:var(--muted)}
+.wday-head span.late,.mcell .num small.late{color:#dc2626;font-weight:700}
+.section .mini{align-self:center}
 .mbar{font-size:11.5px;padding:2px 6px;border-radius:6px;background:var(--tint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-left:3px solid var(--solid)}
 .mbar.done{text-decoration:line-through;opacity:.5}
 .more{font-size:11px;color:var(--muted);padding-left:4px}
@@ -500,7 +502,9 @@ function makeInst(t, key, d){
   let who = state.overrides[key];
   const overridden = !!who;
   if (!who) who = t.assignee === 'alt' ? (mod(periodIndex(t, d), 2) === 0 ? (t.altStart || 'a') : (t.altStart === 'b' ? 'a' : 'b')) : t.assignee;
-  return { task:t, key, date:d, who, overridden, done: !!state.done[key] };
+  // „Ausgelassen“ (skip) gilt als abgeschlossen, zählt aber nicht als erledigt
+  const st = state.done[key];
+  return { task:t, key, date:d, who, overridden, done: !!st, skipped: !!st?.skip };
 }
 
 // Urlaub / Pause: betrifft nur wiederkehrende Aufgaben – einmalige und jährliche Termine bleiben bestehen
@@ -550,10 +554,18 @@ function monthFlexInsts(anyDay){
     .filter(t => pausedDays(t, first, nDays) * 2 < nDays)   // pausiert, wenn die Pause den Großteil des Monats abdeckt
     .map(t => makeInst(t, `${t.sid}|M${first.slice(0,7)}`, first));
 }
+// Offen geblieben: einmalige Termine (ohne Frist), feste Termine der letzten 7 Tage,
+// flexible Aufgaben der Vorwoche und des Vormonats – jeweils, wenn weder erledigt noch ausgelassen
+const OVERDUE_DAYS = 7;
 function overdueInsts(){
-  const td = today();
-  return state.tasks.filter(t => t.freq.type === 'once' && !t.end && t.freq.date < td && t.freq.date >= t.start && !state.done[`${t.sid}|${t.freq.date}`])
-    .map(t => makeInst(t, `${t.sid}|${t.freq.date}`, t.freq.date));
+  const td = today(), seen = new Set(), out = [];
+  const add = i => { if (!i.done && !seen.has(i.key)){ seen.add(i.key); out.push(i); } };
+  state.tasks.filter(t => t.freq.type === 'once' && !t.end && t.freq.date < td && t.freq.date >= t.start && !(state.moves || {})[`${t.sid}|${t.freq.date}`])
+    .forEach(t => add(makeInst(t, `${t.sid}|${t.freq.date}`, t.freq.date)));
+  for (let k = 1; k <= OVERDUE_DAYS; k++) dayInsts(addDays(td, -k)).forEach(add);
+  weekFlexInsts(addDays(monday(td), -7)).forEach(add);
+  monthFlexInsts(addMonths(td, -1)).forEach(add);
+  return out.sort((x, y) => x.date.localeCompare(y.date));
 }
 
 const matchesFilter = i => ui.filter === 'all' || i.who === ui.filter || i.who === 'both';
@@ -590,6 +602,17 @@ function buildDigest(p, d){
   const due = Object.values(state.health || {}).filter(h => h && h.next && h.next <= d);
   if (due.length) parts.push(`🩺 Fällig: ${due.slice(0, 3).map(h => `${h.title} (${h.subject})`).join(', ')}${due.length > 3 ? ' …' : ''}`);
   return {title: `Guten Morgen${name ? ', ' + name : ''}! ☀️`, body: parts.join('\n')};
+}
+
+// Abend-Erinnerung (20 Uhr) für Aufgaben mit „Erinnern“, die heute noch offen sind; null = nichts offen
+const REMIND_HOUR = 20;
+function buildReminder(p, d){
+  const open = sortInsts(dayInsts(d).filter(i => i.task.remind && !i.done && (i.who === p || i.who === 'both')));
+  if (!open.length) return null;
+  return {
+    title: open.length === 1 ? `🔔 Noch offen: ${open[0].task.title}` : `🔔 Noch ${open.length} Aufgaben offen`,
+    body: open.length === 1 ? 'Heute noch zu erledigen – oder in der App verschieben.' : open.map(i => '• ' + i.task.title).join('\n'),
+  };
 }
 /* @core-end */
 
@@ -659,7 +682,9 @@ function itemHTML(i, opts = {}){
   const meta = [`${c.icon} ${c.name}`];
   if (t.kind === 'think') meta.push('🧠 Denkarbeit');
   if (t.mins) meta.push(`⏱ ${t.mins} min`);
-  if (opts.showDate) meta.push(`📆 ${fmtShort(i.date)}`);
+  if (opts.showDate) meta.push(`📆 ${i.key.includes('|W') ? 'KW ' + isoWeek(i.date) : i.key.includes('|M') ? fmt(i.date, {month:'long'}) : fmt(i.date, {weekday:'short', day:'numeric', month:'numeric'})}`);
+  if (i.skipped) meta.push('⏭ ausgelassen');
+  if (t.remind) meta.push(`🔔 ${REMIND_HOUR} Uhr`);
   meta.push(`↻ ${freqText(t)}`);
   if (i.overridden) meta.push('⇄ getauscht');
   if (i.movedFrom) meta.push(`↷ verschoben von ${fmt(i.movedFrom, {weekday:'short', day:'numeric', month:'numeric'})}`);
@@ -680,7 +705,7 @@ function listHTML(arr, emptyText, opts){
 }
 
 function ringHTML(k, list){
-  const mine = list.filter(i => i.who === k || i.who === 'both');
+  const mine = list.filter(i => (i.who === k || i.who === 'both') && !i.skipped);
   const done = mine.filter(i => i.done).length, total = mine.length;
   const r = 24, C = 2 * Math.PI * r, p = total ? done / total : 0;
   return `<div class="ring">
@@ -711,7 +736,10 @@ function renderDay(v){
     ${pauseBannerHTML(d)}${d === td ? requestsHTML() : ''}
     <div class="cols2">
       <div>
-        ${overdue.filter(matchesFilter).length ? `<div class="section warn"><h3>Überfällig</h3></div>${listHTML(overdue.filter(matchesFilter), '', {showDate:true})}` : ''}
+        ${overdue.filter(matchesFilter).length ? `<div class="section warn"><h3>⚠️ Offen geblieben</h3><span class="count">${overdue.filter(matchesFilter).length}</span>
+            <button class="mini" data-action="skip-all" style="margin-left:auto">Alle auslassen</button></div>
+          <p class="muted" style="margin:-4px 2px 10px">Abhaken, wenn es doch erledigt ist – oder antippen, um es zu verschieben oder auszulassen.</p>
+          ${listHTML(overdue.filter(matchesFilter), '', {showDate:true})}` : ''}
         <div class="section"><h3>${d === td ? 'Heute' : 'An diesem Tag'}</h3><span class="count">${list.length}</span></div>
         ${listHTML(list, '<span class="big">🌿</span>Für diesen Tag steht nichts an.')}
       </div>
@@ -736,7 +764,7 @@ function renderWeek(v){
     const list = sortInsts(dayInsts(d).filter(matchesFilter));
     const open = list.filter(i => !i.done).length;
     days += `<div class="wday ${d === td ? 'today' : ''}">
-      <div class="wday-head" data-action="goday" data-date="${d}"><b>${WD[k]} ${parse(d).getDate()}.</b><span>${list.length ? `${open} offen` : ''}</span></div>
+      <div class="wday-head" data-action="goday" data-date="${d}"><b>${WD[k]} ${parse(d).getDate()}.</b><span class="${d < td && open ? 'late' : ''}">${list.length ? `${open} offen` : ''}</span></div>
       ${list.map(i => itemHTML(i, {chip:true})).join('')}
     </div>`;
   }
@@ -759,7 +787,7 @@ function renderMonth(v){
     const shown = list.slice(0, 3);
     const done = list.filter(i => i.done).length;
     cells += `<div class="mcell ${parse(d).getMonth() !== D.getMonth() ? 'out' : ''} ${d === td ? 'today' : ''}" data-action="goday" data-date="${d}">
-      <div class="num">${parse(d).getDate()}${list.length ? `<small>${done}/${list.length}</small>` : ''}</div>
+      <div class="num">${parse(d).getDate()}${list.length ? `<small class="${d < td && done < list.length ? 'late' : ''}">${done}/${list.length}</small>` : ''}</div>
       ${shown.map(i => `<div class="mbar who-${i.who} ${i.done ? 'done' : ''}">${esc(i.task.title)}</div>`).join('')}
       ${list.length > 3 ? `<div class="more">+ ${list.length - 3} weitere</div>` : ''}
       <div class="mdots">${list.map(i => `<span class="dot ${i.who}" style="${i.done ? 'opacity:.3' : ''}"></span>`).join('')}</div>
@@ -837,7 +865,7 @@ function renderBalance(v){
     ws.forEach(w => {
       s[w].n++; s[w].m += m;
       if (think) s[w].tn++; else s[w].hm += m;
-      if (i.done){ s[w].dn++; s[w].dm += m; }
+      if (i.done && !i.skipped){ s[w].dn++; s[w].dm += m; }
       byCat[i.task.cat] = byCat[i.task.cat] || {a:0, b:0};
       byCat[i.task.cat][w] += m;
     });
@@ -974,6 +1002,9 @@ function openTaskForm(task, prefill){
         <label class="field"><span>Dauer (Minuten)</span><input type="number" name="mins" min="0" max="600" step="5" value="${t.mins ?? 15}"></label>
         <label class="field" data-for="daily weekdays weekly weekflex monthly monthflex"><span>Gilt ab</span><input type="date" name="start" min="${td}" value="${startVal}"></label>
       </div>
+      <div class="field" data-for="once daily weekdays weekly monthly yearly"><span>Erinnerung</span>
+        <label class="opt" style="display:block"><input type="checkbox" name="remind" ${t.remind ? 'checked' : ''}><span>🔔 Um ${REMIND_HOUR}:00 Uhr erinnern, falls noch nicht erledigt</span></label>
+        <small>Kommt als Push-Nachricht auf die Handys der zuständigen Person – dort müssen die Benachrichtigungen eingeschaltet sein.</small></div>
       ${isEdit && task.start < td ? `<div class="hint">ℹ️ Änderungen gelten erst ab dem gewählten Datum. Vergangene Tage und Erledigt-Häkchen bleiben unverändert.</div>` : `<div class="hint">ℹ️ Neue Aufgaben wirken nur in die Zukunft – frühestens ab heute.</div>`}
       <div class="actions stack rev">
         ${isEdit ? '<button type="button" class="btn danger" data-action="delete-task">Löschen</button>' : ''}
@@ -1025,6 +1056,7 @@ function submitTask(form, existing){
     assignee: form.querySelector('[name=who]:checked').value,
     altStart: form.querySelector('[name=altStart]:checked')?.value || 'a',
     kind: form.querySelector('[name=kind]:checked')?.value === 'think' ? 'think' : 'do',
+    remind: !['weekflex','monthflex'].includes(type) && !!form.querySelector('[name=remind]')?.checked,
     freq,
   };
 
@@ -1066,6 +1098,7 @@ function deleteTask(task){
 function openInstance(i){
   const t = i.task, c = cat(t.cat);
   const isDayInst = !i.key.includes('|W') && !i.key.includes('|M');
+  const isPast = i.key.includes('|W') ? addDays(i.date, 6) < today() : i.key.includes('|M') ? i.date.slice(0, 7) < today().slice(0, 7) : i.date < today();
   const origDate = i.movedFrom || i.date;
   const when = i.key.includes('|W') ? `Woche ${isoWeek(i.date)} (flexibel)` : i.key.includes('|M') ? `${fmt(i.date, {month:'long', year:'numeric'})} (flexibel)` : fmtLong(i.date);
   const wopt = k => `<label class="opt who who-${k}"><input type="radio" name="ow" value="${k}" ${i.who === k ? 'checked' : ''}><span>${esc(whoName(k))}</span></label>`;
@@ -1082,6 +1115,7 @@ function openInstance(i){
     <div class="actions stack" style="margin-top:14px">
       <button class="btn" data-action="edit" data-id="${t.id}" style="margin-right:auto">Aufgabe bearbeiten</button>
       <button class="btn primary" id="toggleBtn">${i.done ? 'Wieder öffnen' : '✓ Erledigt'}</button>
+      ${isPast && !i.done ? '<button class="btn" id="skipBtn">⏭ Auslassen – diesmal nicht nötig</button>' : ''}
     </div>
     ${reqHTML}
     ${isDayInst ? `
@@ -1133,6 +1167,7 @@ function openInstance(i){
         delete state.overrides[i.key]; save(); closeModal(); render(); toast('Zurückgesetzt');
       });
       sheet.querySelector('#toggleBtn').addEventListener('click', () => { toggleDone(i.key); closeModal(); });
+      sheet.querySelector('#skipBtn')?.addEventListener('click', () => { skipInsts([i.key]); closeModal(); });
       sheet.querySelector('#reqAsk')?.addEventListener('click', () => askTakeover(i, other));
       sheet.querySelector('#reqCancel')?.addEventListener('click', () => {
         delete state.requests[openReq[0]]; save(); closeModal(); render(); toast('Anfrage zurückgezogen');
@@ -1145,11 +1180,27 @@ function openInstance(i){
     });
 }
 
-// Einzelnen Termin auf einen anderen Tag legen; zurück auf den Ursprungstag hebt die Verschiebung auf
-function moveInst(i, to){
+// Einzelnen Termin auf einen anderen Tag legen; zurück auf den Ursprungstag hebt die Verschiebung auf.
+// Ab dem zweiten Verschieben desselben Termins wird augenzwinkernd nachgefragt.
+function moveInst(i, to, confirmed){
   if (!to || (to < today() && to !== (i.movedFrom || i.date))) return toast('Bitte einen Tag ab heute wählen');
   const from = i.movedFrom || i.date;
   state.moves = state.moves || {};
+  if (!confirmed && state.moves[i.key] && to !== from && to !== state.moves[i.key]){
+    return openModal(`
+      <div style="text-align:center;padding:6px 4px 0">
+        <div style="font-size:54px;line-height:1">🦥</div>
+        <h2 style="margin:12px 0 6px;font-size:22px">Willst du es wirklich prokrastinieren? 😄</h2>
+        <p class="muted" style="font-size:15px">„${esc(i.task.title)}“ wurde schon einmal verschoben – ursprünglich war es für ${esc(fmtLong(from))} geplant.</p>
+      </div>
+      <div class="actions stack">
+        <button class="btn" id="procNo">Nein, ich mach’s doch</button>
+        <button class="btn primary" id="procYes">Ja, auf ${esc(fmt(to, {weekday:'long', day:'numeric', month:'numeric'}))} schieben</button>
+      </div>`, sheet => {
+        sheet.querySelector('#procYes').addEventListener('click', () => moveInst(i, to, true));
+        sheet.querySelector('#procNo').addEventListener('click', () => { closeModal(); toast('Stark! 💪'); });
+      });
+  }
   if (to === from) delete state.moves[i.key]; else state.moves[i.key] = to;
   save(); closeModal(); render();
   toast(to === from ? 'Wieder am ursprünglichen Tag' : `Verschoben auf ${fmt(to, {weekday:'long', day:'numeric', month:'numeric'})}`);
@@ -1202,6 +1253,12 @@ function toggleDone(key){
   if (state.done[key]) delete state.done[key];
   else { state.done[key] = {at: Date.now()}; }
   save(); render();
+}
+// Bewusst auslassen: verschwindet aus „Offen geblieben“, zählt aber nicht als erledigt
+function skipInsts(keys){
+  keys.forEach(k => { state.done[k] = {at: Date.now(), skip: 1}; });
+  save(); render();
+  toast(keys.length === 1 ? 'Ausgelassen ⏭' : `${keys.length} Aufgaben ausgelassen`);
 }
 
 /* ---------- Urlaub / Pause ---------- */
@@ -1724,6 +1781,7 @@ document.addEventListener('click', e => {
     case 'log-done':   e.stopPropagation(); openLogDone(el.dataset.id); break;
     case 'logfilter':  ui.logFilter = el.dataset.s; render(); break;
     case 'req-answer': answerRequest(el.dataset.id, el.dataset.a); break;
+    case 'skip-all':   if (confirm('Alle offen gebliebenen Aufgaben auslassen?')) skipInsts(overdueInsts().filter(matchesFilter).map(i => i.key)); break;
     case 'gh-save': {
       const v = ($('#ghTok')?.value || '').trim();
       if (!famRef) { toast('Gerade keine Verbindung zur Datenbank'); break; }
@@ -1792,7 +1850,7 @@ const normPeople = p => ({
 const normTask = t => ({
   id:t.id, sid:t.sid || t.id, origin:t.origin || t.start, start:t.start, end:t.end || null, created:t.created || 0,
   title:t.title || '', desc:t.desc || '', cat:t.cat || 'sonstiges', mins:t.mins || 0,
-  assignee:t.assignee || 'a', altStart:t.altStart || 'a', kind:t.kind === 'think' ? 'think' : 'do',
+  assignee:t.assignee || 'a', altStart:t.altStart || 'a', kind:t.kind === 'think' ? 'think' : 'do', remind:!!t.remind && !['weekflex','monthflex'].includes(t.freq.type),
   freq:{type:t.freq.type, every:t.freq.every || 1, days:[...(t.freq.days || [])], dom:t.freq.dom || 1, date:t.freq.date || ''},
 });
 // Frei strukturierte Sammlungen (je Eintrag ein Pfad in der Cloud)
@@ -1810,7 +1868,7 @@ function canon(v){
 function flatten(s){
   const m = {people: JSON.stringify(normPeople(s.people))};
   s.tasks.forEach(t => m['tasks/' + t.id] = JSON.stringify(normTask(t)));
-  for (const k in s.done) m['done/' + k] = JSON.stringify({at: s.done[k]?.at || 0});
+  for (const k in s.done) m['done/' + k] = JSON.stringify(s.done[k]?.skip ? {at: s.done[k].at || 0, skip: 1} : {at: s.done[k]?.at || 0});
   for (const k in s.overrides) m['overrides/' + k] = JSON.stringify(String(s.overrides[k]));
   for (const k in s.moves || {}) m['moves/' + k] = JSON.stringify(String(s.moves[k]));
   EXTRA.forEach(c => { for (const k in s[c] || {}){ const v = canon(s[c][k]); if (v !== undefined) m[c + '/' + k] = JSON.stringify(v); } });
