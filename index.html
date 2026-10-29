@@ -436,6 +436,8 @@ function load(){
   return defaultState();
 }
 let state = load();
+// Früher gab es „Denkarbeit“ vs. „Erledigen“ – jetzt eine gemeinsame Art; alte Markierung entfernen
+state.tasks.forEach(t => delete t.kind);
 let ui = Object.assign({view:'day', filter:'all', balRange:'week', theme:'auto', me:'', kiosk:false}, (() => { try { return JSON.parse(localStorage.getItem(UIKEY)) || {}; } catch(e) { return {}; } })());
 ui.cursor = today();
 
@@ -677,10 +679,9 @@ function itemHTML(i, opts = {}){
   if (opts.chip){
     return `<div class="chip who-${i.who} ${i.done ? 'done' : ''}" data-key="${esc(i.key)}">
       <button class="check" data-action="toggle" aria-label="erledigt">${ICON_CHECK}</button>
-      <div class="item-body" data-action="open">${i.movedFrom ? '↷ ' : ''}${t.kind === 'think' ? '🧠 ' : ''}${c.icon} ${esc(t.title)}</div></div>`;
+      <div class="item-body" data-action="open">${i.movedFrom ? '↷ ' : ''}${c.icon} ${esc(t.title)}</div></div>`;
   }
   const meta = [`${c.icon} ${c.name}`];
-  if (t.kind === 'think') meta.push('🧠 Denkarbeit');
   if (t.mins) meta.push(`⏱ ${t.mins} min`);
   if (opts.showDate) meta.push(`📆 ${i.key.includes('|W') ? 'KW ' + isoWeek(i.date) : i.key.includes('|M') ? fmt(i.date, {month:'long'}) : fmt(i.date, {weekday:'short', day:'numeric', month:'numeric'})}`);
   if (i.skipped) meta.push('⏭ ausgelassen');
@@ -822,7 +823,7 @@ function renderTasks(v){
       <div class="ic">${c.icon}</div>
       <div class="main"><div class="item-title">${esc(t.title)}</div>
         ${t.desc ? `<div class="item-desc">${esc(t.desc)}</div>` : ''}
-        <div class="item-meta"><span>↻ ${esc(freqText(t))}</span>${t.mins ? `<span>⏱ ${t.mins} min</span>` : ''}${t.kind === 'think' ? '<span>🧠 Denkarbeit</span>' : ''}</div></div>
+        <div class="item-meta"><span>↻ ${esc(freqText(t))}</span>${t.mins ? `<span>⏱ ${t.mins} min</span>` : ''}</div></div>
       ${future}<span class="badge"><span class="dot ${cls}"></span>${esc(whoName(t.assignee))}</span>
     </div>`;
   };
@@ -857,14 +858,13 @@ function rangeInsts(){
 }
 function renderBalance(v){
   const insts = rangeInsts();
-  const s = {a:{n:0,m:0,dn:0,dm:0,tn:0,hm:0}, b:{n:0,m:0,dn:0,dm:0,tn:0,hm:0}};
+  const s = {a:{n:0,m:0,dn:0,dm:0}, b:{n:0,m:0,dn:0,dm:0}};
   const byCat = {};
   insts.forEach(i => {
-    const m = i.task.mins || 0, think = i.task.kind === 'think';
+    const m = i.task.mins || 0;
     const ws = i.who === 'both' ? ['a','b'] : [i.who];
     ws.forEach(w => {
       s[w].n++; s[w].m += m;
-      if (think) s[w].tn++; else s[w].hm += m;
       if (i.done && !i.skipped){ s[w].dn++; s[w].dm += m; }
       byCat[i.task.cat] = byCat[i.task.cat] || {a:0, b:0};
       byCat[i.task.cat][w] += m;
@@ -889,8 +889,7 @@ function renderBalance(v){
     <div style="display:flex;align-items:center;gap:10px"><div class="avatar">${esc(initials(k))}</div><b style="font-size:17px">${esc(P(k).name)}</b></div>
     <div class="row"><span>Aufgaben geplant</span><b>${s[k].n}</b></div>
     <div class="row"><span>davon erledigt</span><b>${s[k].dn}</b></div>
-    <div class="row"><span>🧠 Denkarbeit</span><b>${s[k].tn} ${s[k].tn === 1 ? 'Sache' : 'Sachen'}</b></div>
-    <div class="row"><span>🛠️ Erledigen</span><b>${fmtMins(s[k].hm)}</b></div>
+    <div class="row"><span>Zeit geplant</span><b>${fmtMins(s[k].m)}</b></div>
     <div class="row"><span>Zeit erledigt</span><b>${fmtMins(s[k].dm)}</b></div></div>`;
   const cats = CATS.filter(c => byCat[c.id] && (byCat[c.id].a + byCat[c.id].b) > 0);
   v.innerHTML = `
@@ -898,10 +897,8 @@ function renderBalance(v){
       <button class="${ui.balRange === 'week' ? 'active' : ''}" data-action="balrange" data-r="week">Woche</button>
       <button class="${ui.balRange === 'month' ? 'active' : ''}" data-action="balrange" data-r="month">Monat</button>
     </div>
-    ${splitCard('🧠 Denkarbeit – im Kopf tragen', 'Wie viele Dinge jede Person im Blick behalten, planen und organisieren muss (Anzahl).',
-      s.a.tn, s.b.tn, n => n, 'Noch keine Aufgaben als „Dran denken & planen“ markiert – das geht beim Bearbeiten einer Aufgabe unter „Art der Aufgabe“.')}
-    ${splitCard('🛠️ Erledigen – mit den Händen', 'Geplante Zeit für alles, was getan werden muss.',
-      s.a.hm, s.b.hm, fmtMins, 'Noch keine Aufgaben mit Zeitangabe in diesem Zeitraum.')}
+    ${splitCard('🧠🛠️ Denkarbeit & Erledigen', 'Geplante Zeit für alles, was im Kopf getragen, organisiert und getan werden muss.',
+      s.a.m, s.b.m, fmtMins, 'Noch keine Aufgaben mit Zeitangabe in diesem Zeitraum.')}
     <div class="hint">„Beide“-Aufgaben zählen für beide voll. Abwechselnde Aufgaben zählen für die Person, die gerade dran ist. Pausierte Aufgaben zählen nicht.</div>
     <div class="stat-grid">${statCard('a')}${statCard('b')}</div>
     <div class="section"><h3>Nach Bereichen</h3></div>
@@ -963,7 +960,7 @@ function openTaskForm(task, prefill){
   const isEdit = !!task;
   pendingInboxId = prefill?.inboxId || null;
   const t = task ? JSON.parse(JSON.stringify(task)) : {
-    title: prefill?.title || '', desc:'', cat:'haushalt', mins:15, kind:'do', assignee: ui.filter === 'b' ? 'b' : 'a',
+    title: prefill?.title || '', desc:'', cat:'haushalt', mins:15, assignee: ui.filter === 'b' ? 'b' : 'a',
     freq:{type:'weekly', every:1, days:[dow(td)], dom:parse(td).getDate(), date:td}, start:td
   };
   t.freq = Object.assign({every:1, days:[dow(td)], dom:parse(td).getDate(), date:td}, t.freq);
@@ -979,9 +976,6 @@ function openTaskForm(task, prefill){
       <div class="field"><span>Wer ist zuständig?</span><div class="opts">
         ${whoOpt('a', P('a').name)}${whoOpt('b', P('b').name)}${whoOpt('both','Beide')}${whoOpt('alt','Abwechselnd')}
       </div></div>
-      <div class="field"><span>Art der Aufgabe</span><div class="opts">
-        ${opt('kind', 'do', '🛠️ Erledigen', t.kind !== 'think')}${opt('kind', 'think', '🧠 Dran denken &amp; planen', t.kind === 'think')}
-      </div><small>„Dran denken &amp; planen“ ist Kopfarbeit: Termine im Blick behalten, Geschenke überlegen, Infos sichten, organisieren. Die Balance zählt sie getrennt.</small></div>
       <div class="field" data-show="alt"><span>Wer beginnt?</span><div class="opts">
         ${opt('altStart','a',esc(P('a').name),(t.altStart||'a') === 'a')}${opt('altStart','b',esc(P('b').name),t.altStart === 'b')}
       </div><small>Wechselt je Tag, Woche bzw. Monat – je nach Häufigkeit.</small></div>
@@ -1055,7 +1049,6 @@ function submitTask(form, existing){
     mins: Math.max(0, parseInt(val('mins')) || 0),
     assignee: form.querySelector('[name=who]:checked').value,
     altStart: form.querySelector('[name=altStart]:checked')?.value || 'a',
-    kind: form.querySelector('[name=kind]:checked')?.value === 'think' ? 'think' : 'do',
     remind: !['weekflex','monthflex'].includes(type) && !!form.querySelector('[name=remind]')?.checked,
     freq,
   };
@@ -1850,7 +1843,7 @@ const normPeople = p => ({
 const normTask = t => ({
   id:t.id, sid:t.sid || t.id, origin:t.origin || t.start, start:t.start, end:t.end || null, created:t.created || 0,
   title:t.title || '', desc:t.desc || '', cat:t.cat || 'sonstiges', mins:t.mins || 0,
-  assignee:t.assignee || 'a', altStart:t.altStart || 'a', kind:t.kind === 'think' ? 'think' : 'do', remind:!!t.remind && !['weekflex','monthflex'].includes(t.freq.type),
+  assignee:t.assignee || 'a', altStart:t.altStart || 'a', remind:!!t.remind && !['weekflex','monthflex'].includes(t.freq.type),
   freq:{type:t.freq.type, every:t.freq.every || 1, days:[...(t.freq.days || [])], dom:t.freq.dom || 1, date:t.freq.date || ''},
 });
 // Frei strukturierte Sammlungen (je Eintrag ein Pfad in der Cloud)
